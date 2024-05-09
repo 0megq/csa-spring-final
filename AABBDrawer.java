@@ -43,7 +43,12 @@ public class AABBDrawer {
     }
 
     private void outline(Graphics2D g) {
+        Vector2 aabbEnd = aabb.getPos().add(aabb.getSize());
         g.setColor(drawSettings.getOutlineColor());
-        g.drawRect((int)aabb.getPos().getX(), (int)aabb.getPos().getY(), (int)aabb.getSize().getX(), (int)aabb.getSize().getY());
+
+        switch (drawSettings.getOutlineType()) {
+            case 
+            g.drawRect((int)aabb.getPos().getX(), (int)aabb.getPos().getY(), (int)aabb.getSize().getX(), (int)aabb.getSize().getY());
+        }
     }
 }
