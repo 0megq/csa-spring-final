@@ -1,11 +1,8 @@
+import java.awt.*;
+
 public class Vector2 {
     private double x;
     private double y;
-    
-    public static void main(String[] args) {
-        Vector2 v = new Vector2(2, 2);
-        System.out.println(v.getAngle());
-    }
     
     public Vector2() {
         x = 0;
@@ -16,11 +13,25 @@ public class Vector2 {
         this.x = x;
         this.y = y;
     }
+
+    public Vector2(Point point) {
+        this.x = point.getX();
+        this.y = point.getY();
+    }
+
+    public void copy(Vector2 other) {
+        x = other.x;
+        y = other.y;
+    }
     
     public Vector2 add(Vector2 other) {
         return new Vector2(x + other.x, y + other.y);
     }
     
+    public Vector2 subtract(Vector2 other) {
+        return new Vector2(x - other.x, y - other.y);
+    }
+
     public Vector2 negate() {
         return new Vector2(-x, -y);
     }
@@ -38,7 +49,7 @@ public class Vector2 {
     }
     
     public double distanceTo(Vector2 other) {
-        return Math.sqrt(Math.pow(x - other.x, 2), Math.pow(y - other.y, 2));
+        return Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2));
     }
     
     public double getLength() {
@@ -51,5 +62,17 @@ public class Vector2 {
     
     public double getY() {
         return y;
-    } 
+    }
+
+    public Point toPoint() {
+        return new Point((int)x, (int)y);
+    }
+
+    public String toString() {
+        return "(" + x + "," + y + ")";
+    }
+
+    public static Vector2 fromPolar(double r, double theta) {
+        return new Vector2(r * Math.sin(theta), r * Math.cos(theta));
+    }
 }

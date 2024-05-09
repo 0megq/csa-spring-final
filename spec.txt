@@ -9,6 +9,12 @@ Idea: 2d golfing game
 - Impulse (velocity) of hit is applied to ball
 - Ball will bounce on ground (inelastic collision)
     - bounce factor
+PlayerInput class
+    variables
+        - ballPosition
+        - maxLength
+    functions
+        - 
 Ball class
     variables
         - velocity (Vector2)
@@ -58,13 +64,15 @@ Vector2 class
 
 World class (deals with physics simulation)
     variables
+        - static finals for constants like (input max distance)
         - ball
         - ground AABB[]
-        - hole (AABB[])
+        - hole (AABB)
     functions
         - update (called when simulating the ball)
         - isBallInHole (returns whether or not ball is in the hole)
-        - loadLevel( takes a level class and deep copies the variables 
+        - loadLevel (takes a level class and deep copies the variables)
+        - onPlayerMouseRelease (gets mouse direction to ball and distance)
         
 Level class (information for how a level is setup)
     variables

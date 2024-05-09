@@ -2,6 +2,7 @@ import java.awt.*;
 enum DrawType {
     FILL,
     OUTLINE,
+    BOTH,
 }
 
 enum OutlineType {
@@ -12,7 +13,7 @@ enum OutlineType {
 
 public class AABBDrawSettings {
     private boolean visible;
-    private DrawType type;
+    private DrawType drawType;
     private Color fillColor;
     private final boolean[] OUTLINES_TO_DRAW;
     private Color outlineColor;
@@ -21,13 +22,44 @@ public class AABBDrawSettings {
     public AABBDrawSettings() {
         OUTLINES_TO_DRAW = new boolean[4];
     }
+
+    public AABBDrawSettings(boolean visible, DrawType drawType, Color fillColor, boolean[] outlinesToDraw, Color outlineColor, OutlineType outlineType) {
+        this.visible = visible;
+        this.drawType = drawType;
+        this.fillColor = fillColor;
+        this.OUTLINES_TO_DRAW = new boolean[4];
+        this.OUTLINES_TO_DRAW[0] = outlinesToDraw[0];
+        this.OUTLINES_TO_DRAW[1] = outlinesToDraw[1];
+        this.OUTLINES_TO_DRAW[2] = outlinesToDraw[2];
+        this.OUTLINES_TO_DRAW[3] = outlinesToDraw[3];
+        this.outlineColor = outlineColor;
+        this.outlineType = outlineType;
+    }
+
+    public void copy(AABBDrawSettings other) {
+        visible = other.visible;
+        drawType = other.drawType;
+        fillColor = other.fillColor;
+        OUTLINES_TO_DRAW[0] = other.OUTLINES_TO_DRAW[0];
+        OUTLINES_TO_DRAW[1] = other.OUTLINES_TO_DRAW[1];
+        OUTLINES_TO_DRAW[2] = other.OUTLINES_TO_DRAW[2];
+        OUTLINES_TO_DRAW[3] = other.OUTLINES_TO_DRAW[3];
+        outlineColor = other.outlineColor;
+        outlineType = other.outlineType;
+    }
+
+    public AABBDrawSettings duplicate() {
+        AABBDrawSettings newSettings = new AABBDrawSettings();
+        newSettings.copy(this);
+        return newSettings;
+    }
     
     public boolean getVisible() {
         return visible;
     }
     
     public DrawType getDrawType() {
-        return type;
+        return drawType;
     }
     
     public Color getFillColor() {
@@ -42,7 +74,7 @@ public class AABBDrawSettings {
         return outlineColor;
     }
     
-    public boolean getOutlineType() {
+    public OutlineType getOutlineType() {
         return outlineType;
     }
     
@@ -58,7 +90,7 @@ public class AABBDrawSettings {
         this.fillColor = fillColor;
     }
     
-    public void setVisible(boolean visible) {
-        this.visible = visible;
+    public void setOutlineColor(Color outlineColor) {
+        this.outlineColor = outlineColor;
     }
 }

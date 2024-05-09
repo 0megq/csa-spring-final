@@ -1,4 +1,35 @@
 public class AABB {
-    private Vector2 position;
+    private Vector2 pos;
     private Vector2 size;
+
+    public AABB() {
+        pos = new Vector2();
+        size = new Vector2();
+    }
+
+    public AABB(Vector2 pos, Vector2 size) {
+        this.pos = pos;
+        this.size = size;
+    }
+
+    public AABB(double x, double y, double w, double h) {
+        this.pos = new Vector2(x, y);
+        this.size = new Vector2(w, h);
+    }
+
+    public void setPos(Vector2 pos) {
+        this.pos = pos;
+    }
+
+    public void setSize(Vector2 size) {
+        this.size = size;
+    }
+
+    public Vector2 getPos() {
+        return pos;
+    }
+    
+    public Vector2 getSize() {
+        return size;
+    }
 }
