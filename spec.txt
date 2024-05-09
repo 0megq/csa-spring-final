@@ -1,0 +1,82 @@
+Idea: 2d golfing game
+- Player aims an arrow indicating direction and power of golf swing
+- Extra: Show player and swinging golf stick
+- Simulate projectile motion of ball in air
+- Ball must be in front of the flag for certain time before it is counted as falling in the hole
+- Ball has a velocity
+- Gravity (acceleration) is constantly applied
+- When touching ground normal force (acceleration) is applied up
+- Impulse (velocity) of hit is applied to ball
+- Ball will bounce on ground (inelastic collision)
+    - bounce factor
+Ball class
+    variables
+        - velocity (Vector2)
+        - boundingBox (AABB)
+        - restitution/bounce (double)
+        - gravity (double)
+        
+    functions
+        - hit (sets velocity and starts simulation)
+        - simulate (simulate )
+        - get velocity (when velocity is near zero the ball will stop being simulated and the player can hit the ball again)
+
+AABB class (Axis aligned bounding box)
+    variables
+        - position (Vector2) - top left
+        - size (Vector2)
+    functions
+        - isColliding(checks if colliding with other AABB)
+
+AABBDrawSettings
+    variables
+        - sidesToDraw (boolean[4] left,top,right,bot)
+        - fill color
+        - drawType (fill, hollow, fill and outline)
+        - outline color
+        - outline width
+
+AABBDrawer
+    variables
+        - AABB
+        - AABBDrawSettings
+    functions
+        - Draw(Graphics g)
+
+Vector2 class
+    variables
+        - x (double)
+        - y (double)
+
+    functions
+        - get as point (converts vector2 to point)
+        - scaling and adding/substracting
+        - rotating
+        - get angle
+        - equals
+        - static get up, down, left, right
+
+World class (deals with physics simulation)
+    variables
+        - ball
+        - ground AABB[]
+        - hole (AABB[])
+    functions
+        - update (called when simulating the ball)
+        - isBallInHole (returns whether or not ball is in the hole)
+        - loadLevel( takes a level class and deep copies the variables 
+        
+Level class (information for how a level is setup)
+    variables
+        - Vector2 ballStart
+        - AABB[] ground
+        - AABB hole
+        - int 
+
+Graphics class
+    functions
+        - draw AABB
+
+Classes:
+- Graphics/UI
+-
