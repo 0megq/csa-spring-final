@@ -17,6 +17,11 @@ public class AABB {
 		this.size = new Vector2(w, h);
 	}
 
+	public boolean isCollding(AABB other) {
+		return pos.getX() < other.pos.getX() + other.size.getX() && other.pos.getX() < pos.getX() + size.getX()
+				&& pos.getY() < other.pos.getY() + other.size.getY() && other.pos.getY() < pos.getY() + size.getY();
+	}
+
 	public void copy(AABB other) {
 		this.pos.copy(other.pos);
 		this.size.copy(other.size);
@@ -36,5 +41,9 @@ public class AABB {
 
 	public Vector2 getSize() {
 		return size;
+	}
+
+	public String toString() {
+		return "P: " + pos + ", S: " + size;
 	}
 }

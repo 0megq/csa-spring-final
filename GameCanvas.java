@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.awt.event.*;
-import java.awt.MouseInfo;
 
 public class GameCanvas extends JComponent {
 
@@ -18,20 +17,32 @@ public class GameCanvas extends JComponent {
 		elapsedTicks = 0;
 		// Create world
 		world = new World();
-		// Get ball from world
-		Ball ball = world.getBall();
+		// Get ball aabb from world
+		AABB ballAABB = world.getBallAABB();
 		// Create draw settings for ball
 		AABBDrawSettings ballDrawSettings = new AABBDrawSettings(true, DrawType.FILL, Color.RED);
 		// Create ballDrawer to draw ball
-		AABBDrawer ballDrawer = new AABBDrawer(ball.getBoundingBox(), ballDrawSettings);
+		AABBDrawer ballDrawer = new AABBDrawer(ballAABB, ballDrawSettings);
 		drawers.add(ballDrawer);
+
+		ArrayList<AABB> terrain = world.getTerrain();
+		AABBDrawSettings terrainDrawSettings = new AABBDrawSettings(true, DrawType.FILL, Color.BLACK);
+		for (AABB aabb : terrain) {
+			drawers.add(new AABBDrawer(aabb, terrainDrawSettings));
+		}
+
+		AABB cursorFollow = new AABB(0, 0, 15, 15);
+
+		drawers.add(new AABBDrawer(cursorFollow, new AABBDrawSettings(true, DrawType.FILL, new Color(0, 255, 0, 120))));
 
 		class UpdateListener implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				// Get the mouse position
 				Vector2 screenMouseLoc = new Vector2(MouseInfo.getPointerInfo().getLocation());
 				Vector2 componentLoc = new Vector2(getLocationOnScreen());
-				world.setMousePosition(screenMouseLoc.subtract(componentLoc));
+				Vector2 mousePos = screenMouseLoc.subtract(componentLoc);
+				world.setMousePosition(mousePos);
+				cursorFollow.setPos(mousePos);
 
 				// Update world
 				world.update(DELTA);

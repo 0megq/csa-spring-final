@@ -2,7 +2,10 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 
 public class World {
-	private Ball ball;
+	private AABB ballAABB;
+	private Vector2 ballVelocity;
+	private double ballBounceFactor;
+	private double ballGravity;
 	private ArrayList<AABB> terrain;
 	private AABB hole;
 	private boolean isMouseDown;
@@ -11,27 +14,48 @@ public class World {
 	private Vector2 mousePos;
 
 	public World() {
-		ball = new Ball(new Vector2(200, 0), new AABB(30, 30, 5, 5), 0.5, 10);
+		ballVelocity = new Vector2(30.0, 15.0);
+		ballAABB = new AABB(150, 150, 5, 5);
+		ballBounceFactor = 0.5;
+		ballGravity = 10;
 		terrain = new ArrayList<>();
 		hole = new AABB();
 		isMouseDown = false;
 		mouseJustPressed = false;
 		mouseJustReleased = false;
 		mousePos = new Vector2();
+
+		terrain.add(new AABB(0, 380, 600, 20)); // ground
+		terrain.add(new AABB(300, 200, 10, 80)); // ground
 	}
 
 	public void update(double delta) {
 
-		Vector2 ballVelocity = ball.getVelocity();
-		if (!ballVelocity.equals(Vector2.ZERO)) {
-			Vector2 ballPos = ball.getBoundingBox().getPos();
-			ballPos.setX(ballPos.getX() + ballVelocity.getX() * delta);
-			ballPos.setY(ballPos.getY() + ballVelocity.getY() * delta);
+		System.out.println();
+
+		while (!ballVelocity.equals(Vector2.ZERO)) { // replace with while to check for collision later
+			integrateBallPos(delta);
 		}
 
 		// These should be at end of the update function
 		mouseJustPressed = false;
 		mouseJustReleased = false;
+	}
+
+	// Moves the ball by its velocity for delta seconds
+	private void integrateBallPos(double delta) {
+		Vector2 ballPos = ballAABB.getPos();
+		ballPos.setX(ballPos.getX() + ballVelocity.getX() * delta);
+		ballPos.setY(ballPos.getY() + ballVelocity.getY() * delta);
+	}
+
+	private AABB isBallColliding() {
+		for (AABB terrainAABB : terrain) {
+			if (ballAABB.isCollding(terrainAABB)) {
+				return terrainAABB;
+			}
+		}
+		return null;
 	}
 
 	public void mousePressed(MouseEvent e) {
@@ -48,8 +72,8 @@ public class World {
 		mousePos.copy(pos);
 	}
 
-	public void setBall(Ball ball) {
-		this.ball = ball;
+	public void setBallAABB(AABB aabb) {
+		this.ballAABB = aabb;
 	}
 
 	public void setTerrain(ArrayList<AABB> terrain) {
@@ -64,8 +88,8 @@ public class World {
 		terrain.add(box);
 	}
 
-	public Ball getBall() {
-		return ball;
+	public AABB getBallAABB() {
+		return ballAABB;
 	}
 
 	public ArrayList<AABB> getTerrain() {
