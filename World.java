@@ -31,9 +31,8 @@ public class World {
 
 	public void update(double delta) {
 
-		System.out.println();
 
-		while (!ballVelocity.equals(Vector2.ZERO)) { // replace with while to check for collision later
+		if (!ballVelocity.equals(Vector2.ZERO)) { // replace with while to check for collision later
 			integrateBallPos(delta);
 		}
 

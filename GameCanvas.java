@@ -30,13 +30,14 @@ public class GameCanvas extends JComponent {
 		for (AABB aabb : terrain) {
 			drawers.add(new AABBDrawer(aabb, terrainDrawSettings));
 		}
-
 		AABB cursorFollow = new AABB(0, 0, 15, 15);
 
 		drawers.add(new AABBDrawer(cursorFollow, new AABBDrawSettings(true, DrawType.FILL, new Color(0, 255, 0, 120))));
-
-		class UpdateListener implements ActionListener {
-			public void actionPerformed(ActionEvent e) {
+        
+		// Setup game update cycle
+		Timer updateTimer = new Timer(MSPT, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 				// Get the mouse position
 				Vector2 screenMouseLoc = new Vector2(MouseInfo.getPointerInfo().getLocation());
 				Vector2 componentLoc = new Vector2(getLocationOnScreen());
@@ -50,24 +51,22 @@ public class GameCanvas extends JComponent {
 				repaint();
 				// Increase ticks
 				elapsedTicks += 1;
-			}
-		}
+            }
+        });
+        // Start game update cycle
+		updateTimer.start();
 
-		// Begin the game update cycle
-		Timer t = new Timer(MSPT, new UpdateListener());
-		t.start();
-
-		// Get mouse clicks and send clicks to world
-		class MouseInput extends MouseAdapter {
-			public void mousePressed(MouseEvent e) {
+		// Get mouse clicks and send clicks to world object
+		addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
 				world.mousePressed(e);
 			}
-
+            @Override
 			public void mouseReleased(MouseEvent e) {
 				world.mouseReleased(e);
 			}
-		}
-		addMouseListener(new MouseInput());
+        });
 	}
 
 	public void paintComponent(Graphics g) {
