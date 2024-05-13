@@ -8,6 +8,7 @@ public class GameCanvas extends JComponent {
 	public static final int MSPT = 16; // ms per tick, also our tick speed
 	public static final double DELTA = MSPT / 1000.0; // delta time (s per tick)
 	public static final double FPS = 1 / DELTA;
+	private static final float aimLineWidth = 4; 
 
 	private ArrayList<AABBDrawer> drawers = new ArrayList<AABBDrawer>();
 	private int elapsedTicks;
@@ -72,9 +73,16 @@ public class GameCanvas extends JComponent {
 	public void paintComponent(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		for (AABBDrawer drawer : drawers) {
-			if (drawer.getShouldDraw())
-				drawer.draw(g2);
+			if (drawer.getShouldDraw()) {
+					drawer.draw(g2);
+			}
 		}
-
+		if (world.isAiming()) {
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(aimLineWidth));
+			Vector2 ballPos = world.getBallAABB().getCenter();
+			Vector2 mousePos = world.getMousePos();
+			g2.drawLine((int)ballPos.getX(), (int)ballPos.getY(), (int)mousePos.getX(), (int)mousePos.getY());
+		}
 	}
 }

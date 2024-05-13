@@ -35,12 +35,24 @@ public class AABB {
 		this.size = size;
 	}
 
+	public void setCenter(Vector2 center) {
+		// TODO: Implement this
+	}
+
 	public Vector2 getPos() {
 		return pos;
 	}
 
 	public Vector2 getSize() {
 		return size;
+	}
+
+	public Vector2 getEnd() {
+		return pos.add(size);
+	}
+
+	public Vector2 getCenter() {
+		return pos.add(size.multiply(0.5));
 	}
 
 	public String toString() {

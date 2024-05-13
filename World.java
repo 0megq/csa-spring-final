@@ -6,12 +6,15 @@ public class World {
 	private Vector2 ballVelocity;
 	private double ballBounceFactor;
 	private double ballGravity;
+	private double ballLaunchMultiplier; // Multiplied by distance between ball and mouse to get magnitude of launch velocity
 	private ArrayList<AABB> terrain;
 	private AABB hole;
 	private boolean isMouseDown;
 	private boolean mouseJustPressed;
 	private boolean mouseJustReleased;
 	private Vector2 mousePos;
+	private boolean waitingForInput;
+	private boolean aiming; // When mouse is held down and mouse is moving around. If mouse goes off screen this turns to false
 
 	public World() {
 		ballVelocity = new Vector2(30.0, 15.0);
@@ -24,6 +27,8 @@ public class World {
 		mouseJustPressed = false;
 		mouseJustReleased = false;
 		mousePos = new Vector2();
+		waitingForInput = true;
+		ballLaunchMultiplier = 1.0;
 
 		terrain.add(new AABB(0, 380, 600, 20)); // ground
 		terrain.add(new AABB(300, 200, 10, 80)); // ground
@@ -32,8 +37,32 @@ public class World {
 	public void update(double delta) {
 
 
-		if (!ballVelocity.equals(Vector2.ZERO)) { // replace with while to check for collision later
-			integrateBallPos(delta);
+		if (!waitingForInput) { // replace with while to check for collision later
+			ballVelocity.setY(ballVelocity.getY() + ballGravity); // apply gravity
+			integrateBallPos(delta); // move ball based on velocity
+			if (isBallColliding() != null) {
+				ballVelocity.copy(Vector2.ZERO); // temporary solution for collision
+			}
+			if (ballVelocity.equals(Vector2.ZERO)) { // stop moving ball if velocity = 0
+				waitingForInput = true;
+			}
+		} else if (aiming) {
+			// If mouse released set aiming to false and waiting for input to true and set ball velocity.
+			if (mouseJustReleased) {
+				aiming = false;
+				waitingForInput = false;
+				Vector2 mouseToBall = ballAABB.getCenter().subtract(mousePos);
+				Vector2 newBallVel = mouseToBall.normalize().multiply(mouseToBall.getLength() * 2);
+				ballVelocity.copy(newBallVel);
+			}
+			if (mousePos.getX() < -1 || mousePos.getY() < -1 || mousePos.getX() > Game.WIDTH + 1 || mousePos.getY() > Game.HEIGHT + 1) {
+				aiming = false;
+			}
+			// draw the line
+			System.out.println("aiming");
+
+		} else if (mouseJustPressed) {
+			aiming = true;
 		}
 
 		// These should be at end of the update function
@@ -89,6 +118,14 @@ public class World {
 
 	public AABB getBallAABB() {
 		return ballAABB;
+	}
+
+	public boolean isAiming() {
+		return aiming;
+	}
+
+	public Vector2 getMousePos() {
+		return mousePos;
 	}
 
 	public ArrayList<AABB> getTerrain() {

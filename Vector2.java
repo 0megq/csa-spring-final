@@ -63,7 +63,7 @@ public class Vector2 {
 	}
 
 	public Vector2 normalize() {
-		return new Vector2();
+		return new Vector2(x / getLength(), y / getLength());
 	}
 
 	public double getAngle() {
