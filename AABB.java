@@ -36,7 +36,7 @@ public class AABB {
 	}
 
 	public void setCenter(Vector2 center) {
-		// TODO: Implement this
+		pos.copy(center.subtract(size.multiply(0.5)));
 	}
 
 	public Vector2 getPos() {

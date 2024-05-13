@@ -28,7 +28,7 @@ public class World {
 		mouseJustReleased = false;
 		mousePos = new Vector2();
 		waitingForInput = true;
-		ballLaunchMultiplier = 1.0;
+		ballLaunchMultiplier = 3;
 
 		terrain.add(new AABB(0, 380, 600, 20)); // ground
 		terrain.add(new AABB(300, 200, 10, 80)); // ground
@@ -52,7 +52,7 @@ public class World {
 				aiming = false;
 				waitingForInput = false;
 				Vector2 mouseToBall = ballAABB.getCenter().subtract(mousePos);
-				Vector2 newBallVel = mouseToBall.normalize().multiply(mouseToBall.getLength() * 2);
+				Vector2 newBallVel = mouseToBall.normalize().multiply(mouseToBall.getLength() * ballLaunchMultiplier);
 				ballVelocity.copy(newBallVel);
 			}
 			if (mousePos.getX() < -1 || mousePos.getY() < -1 || mousePos.getX() > Game.WIDTH + 1 || mousePos.getY() > Game.HEIGHT + 1) {
@@ -73,8 +73,7 @@ public class World {
 	// Moves the ball by its velocity for delta seconds
 	private void integrateBallPos(double delta) {
 		Vector2 ballPos = ballAABB.getPos();
-		ballPos.setX(ballPos.getX() + ballVelocity.getX() * delta);
-		ballPos.setY(ballPos.getY() + ballVelocity.getY() * delta);
+		ballPos.copy(ballPos.add(ballVelocity.multiply(delta)));
 	}
 
 	private AABB isBallColliding() {

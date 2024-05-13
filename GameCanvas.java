@@ -8,7 +8,7 @@ public class GameCanvas extends JComponent {
 	public static final int MSPT = 16; // ms per tick, also our tick speed
 	public static final double DELTA = MSPT / 1000.0; // delta time (s per tick)
 	public static final double FPS = 1 / DELTA;
-	private static final float aimLineWidth = 4; 
+	private static final float aimLineWidth = 2; 
 
 	private ArrayList<AABBDrawer> drawers = new ArrayList<AABBDrawer>();
 	private int elapsedTicks;
@@ -44,7 +44,7 @@ public class GameCanvas extends JComponent {
 				Vector2 componentLoc = new Vector2(getLocationOnScreen());
 				Vector2 mousePos = screenMouseLoc.subtract(componentLoc);
 				world.setMousePosition(mousePos);
-				cursorFollow.setPos(mousePos);
+				cursorFollow.setCenter(mousePos);
 
 				// Update world
 				world.update(DELTA);
