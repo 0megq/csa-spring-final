@@ -4,12 +4,12 @@ import java.util.*;
 public class World {
 	private AABB ballAABB;
 	private Vector2 ballVelocity;
-	private double ballBounceFactor;
+	private double ballBounceFactor; // TODO: Implement collisions and bouncing
 	private double ballGravity;
 	private double ballLaunchMultiplier; // Multiplied by distance between ball and mouse to get magnitude of launch velocity
 	private ArrayList<AABB> terrain;
 	private AABB hole;
-	private boolean isMouseDown;
+	private boolean isMouseDown; // TODO: Use this variable
 	private boolean mouseJustPressed;
 	private boolean mouseJustReleased;
 	private Vector2 mousePos;
