@@ -6,6 +6,7 @@ public class World {
 	private Vector2 ballVelocity;
 	private double ballBounceFactor; // TODO: Implement collisions and bouncing
 	private double ballGravity;
+	private double ballFriction; // TODO: Implement friction when ball is on ground. Also figure out how to do ground check
 	private double ballLaunchMultiplier; // Multiplied by distance between ball and mouse to get magnitude of launch velocity
 	private ArrayList<AABB> terrain;
 	private AABB hole;
@@ -36,7 +37,6 @@ public class World {
 
 	public void update(double delta) {
 
-
 		if (!waitingForInput) { // replace with while to check for collision later
 			ballVelocity.setY(ballVelocity.getY() + ballGravity); // apply gravity
 			integrateBallPos(delta); // move ball based on velocity
@@ -55,7 +55,8 @@ public class World {
 				Vector2 newBallVel = mouseToBall.normalize().multiply(mouseToBall.getLength() * ballLaunchMultiplier);
 				ballVelocity.copy(newBallVel);
 			}
-			if (mousePos.getX() < -1 || mousePos.getY() < -1 || mousePos.getX() > Game.WIDTH + 1 || mousePos.getY() > Game.HEIGHT + 1) {
+			if (mousePos.getX() < -1 || mousePos.getY() < -1 || mousePos.getX() > Game.WIDTH + 1
+					|| mousePos.getY() > Game.HEIGHT + 1) {
 				aiming = false;
 			}
 			// draw the line
