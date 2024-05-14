@@ -22,34 +22,29 @@ public class AABB {
 				&& pos.getY() < other.pos.getY() + other.size.getY() && other.pos.getY() < pos.getY() + size.getY();
 	}
 
-	// implement this 
-	public Vector2 getCollisionDirection() {
-	// 	const dx = box.pos.x - this.pos.x;
-    // const px = (box.half.x + this.half.x) - abs(dx);
-    // if (px <= 0) {
-    //   return null;
-    // }
+	public Vector2 getCollisionDirection(AABB other) {
+		Vector2 normal = new Vector2();
+		double dx = other.pos.getX() - pos.getX(); // X distance
+		double px = (other.size.getX() + size.getX()) - Math.abs(dx); // Add size and subtract distance
+		if (px <= 0) { // If px is less than zero then no collision that means the size combined is less than the distance between them.
+			return normal;
+		}
 
-    // const dy = box.pos.y - this.pos.y;
-    // const py = (box.half.y + this.half.y) - abs(dy);
-    // if (py <= 0) {
-    //   return null;
-    // }
+		double dy = other.pos.getX() - pos.getY(); // Y distance
+		double py = (other.size.getY() + size.getY()) - Math.abs(dy);
+		if (py <= 0) {
+			return normal;
+		}
 
-    // const hit = new Hit(this);
-    // if (px < py) {
-    //   const sx = sign(dx);
-    //   hit.delta.x = px * sx;
-    //   hit.normal.x = sx;
-    //   hit.pos.x = this.pos.x + (this.half.x * sx);
-    //   hit.pos.y = box.pos.y;
-    // } else {
-    //   const sy = sign(dy);
-    //   hit.delta.y = py * sy;
-    //   hit.normal.y = sy;
-    //   hit.pos.x = box.pos.x;
-    //   hit.pos.y = this.pos.y + (this.half.y * sy);
-    // }
+		if (px < py) { // px and py is amount the boxes are inside each other in each direction. If there is more y then the collision is from the side
+			double sx = Math.signum(dx);
+			normal.setX(sx);
+		} else {
+			double sy = Math.signum(dy);
+			normal.setY(sy);
+		}
+
+		return normal;
 	}
 
 	public void copy(AABB other) {
