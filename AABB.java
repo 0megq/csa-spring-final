@@ -22,6 +22,36 @@ public class AABB {
 				&& pos.getY() < other.pos.getY() + other.size.getY() && other.pos.getY() < pos.getY() + size.getY();
 	}
 
+	// implement this 
+	public Vector2 getCollisionDirection() {
+	// 	const dx = box.pos.x - this.pos.x;
+    // const px = (box.half.x + this.half.x) - abs(dx);
+    // if (px <= 0) {
+    //   return null;
+    // }
+
+    // const dy = box.pos.y - this.pos.y;
+    // const py = (box.half.y + this.half.y) - abs(dy);
+    // if (py <= 0) {
+    //   return null;
+    // }
+
+    // const hit = new Hit(this);
+    // if (px < py) {
+    //   const sx = sign(dx);
+    //   hit.delta.x = px * sx;
+    //   hit.normal.x = sx;
+    //   hit.pos.x = this.pos.x + (this.half.x * sx);
+    //   hit.pos.y = box.pos.y;
+    // } else {
+    //   const sy = sign(dy);
+    //   hit.delta.y = py * sy;
+    //   hit.normal.y = sy;
+    //   hit.pos.x = box.pos.x;
+    //   hit.pos.y = this.pos.y + (this.half.y * sy);
+    // }
+	}
+
 	public void copy(AABB other) {
 		this.pos.copy(other.pos);
 		this.size.copy(other.size);

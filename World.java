@@ -2,6 +2,7 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 
 public class World {
+	private static int MAX_MOVE_ITERATIONS = 10;
 	private AABB ballAABB;
 	private Vector2 ballVelocity;
 	private double ballBounceFactor; // TODO: Implement collisions and bouncing
@@ -39,9 +40,14 @@ public class World {
 
 		if (!waitingForInput) { // replace with while to check for collision later
 			ballVelocity.setY(ballVelocity.getY() + ballGravity); // apply gravity
-			integrateBallPos(delta); // move ball based on velocity
-			if (isBallColliding() != null) {
-				ballVelocity.copy(Vector2.ZERO); // temporary solution for collision
+			// Move ball by increments and check for collisions
+			for (int i = 0; i < MAX_MOVE_ITERATIONS; i++) {
+				integrateBallPos(delta / MAX_MOVE_ITERATIONS); // Go 1/10th and then check collision if collision then
+				AABB collider = getBallCollidingAABB();
+				if (collider != null) {
+					ballVelocity.setX(-ballVelocity.getX());
+				}
+
 			}
 			if (ballVelocity.equals(Vector2.ZERO)) { // stop moving ball if velocity = 0
 				waitingForInput = true;
@@ -77,7 +83,7 @@ public class World {
 		ballPos.copy(ballPos.add(ballVelocity.multiply(delta)));
 	}
 
-	private AABB isBallColliding() {
+	private AABB getBallCollidingAABB() {
 		for (AABB terrainAABB : terrain) {
 			if (ballAABB.isCollding(terrainAABB)) {
 				return terrainAABB;
