@@ -29,17 +29,21 @@ public class AABB {
 		AABB paddedAabb = new AABB(other.pos.duplicate(), size.add(other.size)); // New aabb with pos of other and size of both combined
 
 		// Variables to see which side the segment is on
-		boolean top = segmentStart.getY() > paddedAabb.pos.getY();
-		boolean bottom = segmentStart.getY() < paddedAabb.pos.getY();
-		boolean right = segmentStart.getX() > paddedAabb.pos.getX();
+		boolean top = segmentStart.getY() < paddedAabb.pos.getY();
+		boolean bottom = segmentStart.getY() > paddedAabb.getEnd().getY();
 		boolean left = segmentStart.getX() < paddedAabb.pos.getX();
+		boolean right = segmentStart.getX() > paddedAabb.getEnd().getX();
+		// System.out.println(top + " " + bottom + " " + right + " " + left);
 
 		Collision collision = null;
 
 		if (top) {
 			// Get y position. See where the ray is at that y position
 			double deltaTo = (other.pos.getY() - pos.getY()) / velocity.getY();
-			double xAtDelta = velocity.getX() * deltaTo;
+			double xAtDelta = pos.getX() + velocity.getX() * deltaTo;
+			// System.out.print("on top side");
+			// System.out.print(" " + xAtDelta);
+			// System.out.println(" " + deltaTo);
 			// Check if the x position after being integrated by deltaTo * velocity is within the bounds of the padded AABB
 			if (xAtDelta > paddedAabb.pos.getX() && xAtDelta < paddedAabb.getEnd().getX()) {
 				// Potential collision

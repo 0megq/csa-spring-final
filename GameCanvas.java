@@ -27,7 +27,7 @@ public class GameCanvas extends JComponent {
 		drawers.add(ballDrawer);
 
 		ArrayList<AABB> terrain = world.getTerrain();
-		AABBDrawSettings terrainDrawSettings = new AABBDrawSettings(true, DrawType.FILL, Color.BLACK);
+		AABBDrawSettings terrainDrawSettings = new AABBDrawSettings(true, DrawType.FILL, new Color(0, 0, 255, 120));
 		for (AABB aabb : terrain) {
 			drawers.add(new AABBDrawer(aabb, terrainDrawSettings));
 		}

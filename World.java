@@ -1,6 +1,8 @@
 import java.awt.event.MouseEvent;
 import java.util.*;
 
+import javax.sound.midi.Soundbank;
+
 public class World {
 	private static int MAX_SWEEPS_PER_FRAME = 10;
 	private AABB ballAABB;
@@ -36,8 +38,8 @@ public class World {
 		ballLaunchMultiplier = 3;
 		turns = 0;
 
-		terrain.add(new AABB(0, 380, 600, 20)); // ground
-		terrain.add(new AABB(300, 200, 10, 80)); // ground
+		// terrain.add(new AABB(0, 380, 600, 20)); // floor
+		terrain.add(new AABB(100, 300, 160, 10)); // wall
 	}
 
 	public void update(final double DELTA) { // we don't want to accidentally change DELTA so it's final
@@ -88,8 +90,8 @@ public class World {
 					|| mousePos.getY() > Game.HEIGHT + 1) {
 				aiming = false;
 			}
-			// draw the line
-			System.out.println("aiming");
+		
+			// System.out.println("aiming");
 
 		} else if (mouseJustPressed) {
 			aiming = true;
@@ -104,12 +106,31 @@ public class World {
 	private boolean simulateBall(double delta) {
 		// Sweep AABB collision will return delta of the collision value
 		AABB.Collision collision = getSweepingBallCollision(delta);
-		// integrate ball
+		if (collision == null) {
+			// If no collision integrate ball and end
+			integrateBallPos(delta);
+			return true;
+		}
+		System.out.println("yo " + collision.DELTA + " " + collision.NORMAL);
+		int sweeps = 0;
 		// while there is remaining delta then there is a collision and less than MAX iterations
-			// bounce in correct direction
-			// Sweep AABB collision with remaining delta and return moved delta
+		while (collision != null && sweeps < MAX_SWEEPS_PER_FRAME) {
 			// integrate ball
+			integrateBallPos(collision.DELTA);
+			// bounce in correct direction
+			if (collision.NORMAL.getX() != 0) {
+				ballVelocity.setX(-ballVelocity.getX() * ballBounceFactor);
+			} else if (collision.NORMAL.getY() != 0) {
+				System.out.print("before: " + ballVelocity); // Ball is colliding twice
+				ballVelocity.setY(-ballVelocity.getY() * ballBounceFactor);
+				System.out.println(" after: " + ballVelocity);
+			}
+			// Sweep AABB collision with remaining delta and return moved delta
+			collision = getSweepingBallCollision(delta);
+			sweeps++;
+		}
 		// return iterations < MAX iterations
+		return sweeps < MAX_SWEEPS_PER_FRAME;
 	}
 
 	// Moves the ball by its velocity for delta seconds
@@ -122,8 +143,13 @@ public class World {
 		AABB.Collision collision = null;
 		for (AABB terrainAABB : terrain) {
 			AABB.Collision currentCollision = ballAABB.sweepAABB(terrainAABB, delta, ballVelocity);
-			if (currentCollision != null && currentCollision.DELTA < delta) {
-				collision
+			// Find the collision with the smallest delta
+			// System.out.println(terrainAABB);
+			if (currentCollision != null)
+				System.out.println(currentCollision.DELTA + " " + currentCollision.NORMAL + " " + delta);
+			if (currentCollision != null && currentCollision.DELTA <= delta) {
+				System.out.println("yo");
+				collision = currentCollision;
 			}
 		}
 		return collision;
