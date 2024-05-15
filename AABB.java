@@ -24,7 +24,7 @@ public class AABB {
 
 	// Sweep the current aabb to the other AABB with the given velocity and delta. The delta at which the collision occurred is returned.
 	// Will return null if aabbs are inside each other
-	public Collision sweepAABB(AABB other, double delta, Vector2 velocity) {
+	public Collision sweepAABB(AABB other, Vector2 velocity) {
 		Vector2 segmentStart = pos.duplicate(); // So we don't accidentally change the position
 		AABB paddedAabb = new AABB(other.pos.duplicate(), size.add(other.size)); // New aabb with pos of other and size of both combined
 
