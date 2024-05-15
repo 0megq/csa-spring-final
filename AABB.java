@@ -22,29 +22,94 @@ public class AABB {
 				&& pos.getY() < other.pos.getY() + other.size.getY() && other.pos.getY() < pos.getY() + size.getY();
 	}
 
-	public Vector2 getCollisionDirection(AABB other) {
-		Vector2 normal = new Vector2();
-		double dx = other.pos.getX() - pos.getX(); // X distance
-		double px = (other.size.getX() + size.getX()) - Math.abs(dx); // Add size and subtract distance
-		if (px <= 0) { // If px is less than zero then no collision that means the size combined is less than the distance between them.
-			return normal;
-		}
+	// Sweep the current aabb to the other AABB with the given velocity and delta. The delta at which the collision occurred is returned.
+	// Will return null if aabbs are inside each other
+	public Collision sweepAABB(AABB other, double delta, Vector2 velocity) {
+		Vector2 segmentStart = pos.duplicate(); // So we don't accidentally change the position
+		AABB paddedAabb = new AABB(other.pos.duplicate(), size.add(other.size)); // New aabb with pos of other and size of both combined
 
-		double dy = other.pos.getX() - pos.getY(); // Y distance
-		double py = (other.size.getY() + size.getY()) - Math.abs(dy);
-		if (py <= 0) {
-			return normal;
-		}
+		// Variables to see which side the segment is on
+		boolean top = segmentStart.getY() > paddedAabb.pos.getY();
+		boolean bottom = segmentStart.getY() < paddedAabb.pos.getY();
+		boolean right = segmentStart.getX() > paddedAabb.pos.getX();
+		boolean left = segmentStart.getX() < paddedAabb.pos.getX();
 
-		if (px < py) { // px and py is amount the boxes are inside each other in each direction. If there is more y then the collision is from the side
-			double sx = Math.signum(dx);
-			normal.setX(sx);
-		} else {
-			double sy = Math.signum(dy);
-			normal.setY(sy);
-		}
+		Collision collision = null;
 
-		return normal;
+		if (top) {
+			// Get y position. See where the ray is at that y position
+			double deltaTo = (other.pos.getY() - pos.getY()) / velocity.getY();
+			double xAtDelta = velocity.getX() * deltaTo;
+			// Check if the x position after being integrated by deltaTo * velocity is within the bounds of the padded AABB
+			if (xAtDelta > paddedAabb.pos.getX() && xAtDelta < paddedAabb.getEnd().getX()) {
+				// Potential collision
+				// DeltaTo is the delta at which the collision occurred. This will be returned
+				// The smaller deltaTo indicates collision happened earlier so we will get minimum between the current col delta and delta to
+				// so that the smallest delta to is returned
+				if (collision == null || deltaTo < collision.DELTA) {
+					collision = new Collision(deltaTo, Vector2.UP);
+				}
+				
+			}
+		}
+		if (bottom) {
+			// Get y position. See where the ray is at that y position
+			double deltaTo = (other.getEnd().getY() - pos.getY()) / velocity.getY();
+			double xAtDelta = velocity.getX() * deltaTo;
+			// Check if the x position after being integrated by deltaTo * velocity is within the bounds of the padded AABB
+			if (xAtDelta > paddedAabb.pos.getX() && xAtDelta < paddedAabb.getEnd().getX()) {
+				// Potential collision
+				// DeltaTo is the delta at which the collision occurred. This will be returned
+				// The smaller deltaTo indicates collision happened earlier so we will get minimum between the current col delta and delta to
+				// so that the smallest delta to is returned
+				if (collision == null || deltaTo < collision.DELTA) {
+					collision = new Collision(deltaTo, Vector2.DOWN);
+				}
+				
+			}
+		}
+		if (left) {
+			// Get x position of left side. Get delta value to left side. get the y value at that delta
+			double deltaTo = (other.pos.getX() - pos.getX()) / velocity.getX();
+			double yAtDelta = velocity.getY() * deltaTo;
+			// Check if the y position after being integrated by deltaTo * velocity is within the bounds of the padded AABB
+			if (yAtDelta > paddedAabb.pos.getY() && yAtDelta < paddedAabb.getEnd().getY()) {
+				// Potential collision
+				// DeltaTo is the delta at which the collision occurred. This will be returned
+				// The smaller deltaTo indicates collision happened earlier so we will get minimum between the current col delta and delta to
+				// so that the smallest delta to is returned
+				if (collision == null || deltaTo < collision.DELTA) {
+					collision = new Collision(deltaTo, Vector2.LEFT);
+				}
+			}
+		}
+		if (right) {
+			// Get x position of right side. See where the ray is at that x position
+			double deltaTo = (other.getEnd().getX() - pos.getX()) / velocity.getX();
+			double yAtDelta = velocity.getY() * deltaTo;
+			// Check if the x position after being integrated by deltaTo * velocity is within the bounds of the padded AABB
+			if (yAtDelta > paddedAabb.pos.getY() && yAtDelta < paddedAabb.getEnd().getY()) {
+				// Potential collision
+				// DeltaTo is the delta at which the collision occurred. This will be returned
+				// The smaller deltaTo indicates collision happened earlier so we will get minimum between the current col delta and delta to
+				// so that the smallest delta to is returned
+				if (collision == null || deltaTo < collision.DELTA) {
+					collision = new Collision(deltaTo, Vector2.RIGHT);
+				}
+				
+			}
+		}
+		return collision;
+	}
+
+	public class Collision {
+		public final double DELTA; // the delta at which the collision occurred. 
+		// if delta is negative then the AABB are already inside each other
+		public final Vector2 NORMAL; // If the an aabb hits the other aabb from the top
+		public Collision(double delta, Vector2 normal) {
+			this.DELTA = delta;
+			this.NORMAL = normal;
+		}
 	}
 
 	public void copy(AABB other) {

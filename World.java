@@ -102,7 +102,8 @@ public class World {
 
 	// The boolean value indicates if the simulation was sucessful or not
 	private boolean simulateBall(double delta) {
-		// Sweep AABB collision will return delta value
+		// Sweep AABB collision will return delta of the collision value
+		AABB.Collision collision = getSweepingBallCollision(delta);
 		// integrate ball
 		// while there is remaining delta then there is a collision and less than MAX iterations
 			// bounce in correct direction
@@ -117,13 +118,15 @@ public class World {
 		ballPos.copy(ballPos.add(ballVelocity.multiply(delta)));
 	}
 
-	private AABB getBallCollidingAABB() {
+	private AABB.Collision getSweepingBallCollision(double delta) {
+		AABB.Collision collision = null;
 		for (AABB terrainAABB : terrain) {
-			if (ballAABB.isCollding(terrainAABB)) {
-				return terrainAABB;
+			AABB.Collision currentCollision = ballAABB.sweepAABB(terrainAABB, delta, ballVelocity);
+			if (currentCollision != null && currentCollision.DELTA < delta) {
+				collision
 			}
 		}
-		return null;
+		return collision;
 	}
 
 	public void mousePressed(MouseEvent e) {
