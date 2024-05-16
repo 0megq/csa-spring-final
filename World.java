@@ -142,7 +142,7 @@ public class World {
 		ballAABB.setPos(ballAABB.getPos().add(ballVelocity.multiply(delta)));
 	}
 
-	private boolean isBallInWhole() {
+	private boolean isBallInHole() {
 		return ballAABB.isColliding(hole);
 	}
 
