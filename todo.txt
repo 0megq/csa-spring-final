@@ -1,3 +1,6 @@
+Other
+	- Make the aim only trigger by left click and cancelled by right click
+
 Level class (information for how a level is setup)
     variables
         - Vector2 ballStart
@@ -14,6 +17,7 @@ UI
 		- play button
 		- level select button
 		- quit button
+		- tutorial
 	- next level menu
 		- quit
 		- next

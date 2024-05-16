@@ -83,7 +83,7 @@ public class World {
 			}
 		} else if (aiming) {
 			// If mouse released set aiming to false and waiting for input to true and launch ball.
-			if (mouseJustReleased || !isMouseDown) {
+			if (mouseJustReleased) {
 				aiming = false;
 				waitingForInput = false;
 				Vector2 mouseToBall = ballAABB.getCenter().subtract(mousePos);
@@ -98,7 +98,7 @@ public class World {
 				aiming = false;
 			}
 
-		} else if (mouseJustPressed || isMouseDown) {
+		} else if (mouseJustPressed) {
 			aiming = true;
 		}
 
