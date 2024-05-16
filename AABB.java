@@ -25,12 +25,12 @@ public class AABB {
 	}
 
 	// Returns true if any of the aabb in the arraylist are colliding with this.
-	public boolean isColliding(ArrayList<AABB> aabbList) {
+	public AABB isColliding(ArrayList<AABB> aabbList) {
 		for (AABB other : aabbList) {
 			if (isColliding(other))
-				return true;
+				return other;
 		}
-		return false;
+		return null;
 	}
 
 	// Sweep the current aabb to the other AABB with the given velocity and delta. The delta at which the collision occurred is returned.

@@ -39,7 +39,7 @@ public class GameCanvas extends JComponent {
 		Timer updateTimer = new Timer(MSPT, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Get the mouse position
+				// Get the mouse position if the component is showing. Prevents crash when launching game
 				if (isShowing()) {
 					Vector2 screenMouseLoc = new Vector2(MouseInfo.getPointerInfo().getLocation());
 					Vector2 componentLoc = new Vector2(getLocationOnScreen());

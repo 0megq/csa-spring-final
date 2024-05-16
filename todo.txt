@@ -1,0 +1,43 @@
+Level class (information for how a level is setup)
+    variables
+        - Vector2 ballStart
+        - AABB[] ground
+        - AABB hole
+        - int par;
+
+UI
+	- draw par and strokes as text
+	- draw hole with flag
+	- improve launch line aesthetics
+	- main menu
+		- play button
+		- level select button
+		- quit button
+	- next level menu
+		- quit
+		- next
+		- retry
+	- pause menu
+		- resume
+		- main menu
+		- quit
+
+Level switching:
+	- call isBallInHole
+	- if in hole
+		- store strokes if lowest amount for level
+		- if last level
+			- Show congratulations menu
+				- main menu
+				- play again
+				- quit game
+				- Nick Vatanshenas for AP CSA 2024
+		- next level menu
+			- wait for input
+			- if next
+				- increment level number
+				- fetch Level object pertaining to level number
+				- create a new world object initialized with values from the Level object
+				- close next level menu
+	
+

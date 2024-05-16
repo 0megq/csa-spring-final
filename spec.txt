@@ -9,12 +9,6 @@ Idea: 2d golfing game
 - Impulse (velocity) of hit is applied to ball
 - Ball will bounce on ground (inelastic collision)
     - bounce factor
-PlayerInput class
-    variables
-        - ballPosition
-        - maxLength
-    functions
-        - 
 Ball class
     variables
         - velocity (Vector2)
@@ -79,12 +73,26 @@ Level class (information for how a level is setup)
         - Vector2 ballStart
         - AABB[] ground
         - AABB hole
-        - int 
+        - int par;
 
 Graphics class
     functions
         - draw AABB
+		- draw par and strokes as text
+		- 
 
 Classes:
 - Graphics/UI
--
+
+Graphics
+- Main menu
+- 
+
+Level switching:
+	- call isBallInHole
+	- if in hole
+		- display next level button
+		- black
+		- increment level number
+		- fetch Level object pertaining to level number
+		- create a new world object initialized with values from the Level object

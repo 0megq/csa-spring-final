@@ -19,25 +19,25 @@ public class World {
 	private Vector2 mousePos;
 	private boolean waitingForInput;
 	private boolean aiming; // When mouse is held down and mouse is moving around. If mouse goes off screen this turns to false
-	private int turns; // TODO: implement this Amount of turns the player has taken. This should be set when the ball stops.
+	private int strokes; // Amount of turns the player has taken. Doesn't count failed ball simulations
 
 	public World() {
-		maxGroundedYVelocity = 2;
+		maxGroundedYVelocity = 4;
 		ballVelocity = new Vector2(30.0, 15.0);
 		ballAABB = new AABB(150, 195, 5, 5);
 		ballLaunchPos = ballAABB.getPos().duplicate();
-		ballBounceFactor = 0.5;
+		ballBounceFactor = 0.4;
 		ballGravity = 300;
 		ballFriction = 100;
-		terrain = new ArrayList<>();
+		terrain = new ArrayList<AABB>();
 		hole = new AABB();
 		isMouseDown = false;
 		mouseJustPressed = false;
 		mouseJustReleased = false;
 		mousePos = new Vector2();
 		waitingForInput = true;
-		ballLaunchMultiplier = 3;
-		turns = 0;
+		ballLaunchMultiplier = 4.0;
+		strokes = 0;
 
 		terrain.add(new AABB(0, 200, 174, 20));
 		terrain.add(new AABB(0, 100, 176, 20));
@@ -53,8 +53,9 @@ public class World {
 			AABB groundAabb = new AABB();
 			groundAabb.setSize(groundAabbSize);
 			groundAabb.setPos(ballAABB.getPos());
+			AABB groundCollider = groundAabb.isColliding(terrain);
 			// If ball is near the ground and y velocity is low enough
-			if (groundAabb.isColliding(terrain) && ballVelocity.getY() <= maxGroundedYVelocity) {
+			if (groundCollider != null && ballVelocity.getY() <= maxGroundedYVelocity) {
 				ballVelocity.setY(0);
 				// This is the new x speed (direction not included) of the ball after friction
 				double newXSpeed = Math.abs(ballVelocity.getX()) - ballFriction * DELTA;
@@ -63,6 +64,8 @@ public class World {
 				else // Otherwise apply friction normally
 					ballVelocity.setX(
 							Math.signum(ballVelocity.getX()) * newXSpeed);
+				// Snap ball y position to floor
+				ballAABB.getPos().setY(groundCollider.getPos().getY() - ballAABB.getSize().getY());
 			} else {
 				ballVelocity.setY(ballVelocity.getY() + ballGravity * DELTA); // apply gravity
 			}
@@ -72,6 +75,7 @@ public class World {
 				System.out.println("Ball simulation failed. Resetting to launch position");
 				ballAABB.setPos(ballLaunchPos);
 				ballVelocity.copy(Vector2.ZERO);
+				strokes--; // Remove a stroke if ball simulation failed
 			}
 
 			if (ballVelocity.equals(Vector2.ZERO)) { // stop moving ball if velocity = 0
@@ -84,6 +88,7 @@ public class World {
 				waitingForInput = false;
 				Vector2 mouseToBall = ballAABB.getCenter().subtract(mousePos);
 				Vector2 newBallVel = mouseToBall.normalize().multiply(mouseToBall.getLength() * ballLaunchMultiplier);
+				strokes++;
 				ballVelocity.copy(newBallVel);
 				ballLaunchPos.copy(ballAABB.getPos());
 				ballAABB.getPos().setY(ballAABB.getPos().getY() - maxGroundedYVelocity * DELTA); // Bug fix for ball glitching through floor
@@ -135,6 +140,10 @@ public class World {
 	// Moves the ball by its velocity for delta seconds
 	private void integrateBallPos(double delta) {
 		ballAABB.setPos(ballAABB.getPos().add(ballVelocity.multiply(delta)));
+	}
+
+	private boolean isBallInWhole() {
+		return ballAABB.isColliding(hole);
 	}
 
 	private AABB.Collision getSweepingBallCollision(double delta) {
