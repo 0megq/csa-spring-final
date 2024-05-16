@@ -3,12 +3,13 @@ import java.util.*;
 
 public class World {
 	private static int MAX_SWEEPS_PER_FRAME = 10;
+	private double maxGroundedYVelocity; // the y velocity at which the ball is considered to be grounded
 	private AABB ballAABB;
 	private Vector2 ballLaunchPos; // Position of ball when it is launched. We use this in case the physics simulation fails and we need to reset.
 	private Vector2 ballVelocity;
-	private double ballBounceFactor; // TODO: Implement collisions and bouncing
+	private double ballBounceFactor;
 	private double ballGravity;
-	private double ballFriction; // TODO: Implement friction when ball is on ground. Also figure out how to do ground check
+	private double ballFriction;
 	private double ballLaunchMultiplier; // Multiplied by distance between ball and mouse to get magnitude of launch velocity
 	private ArrayList<AABB> terrain;
 	private AABB hole;
@@ -21,11 +22,13 @@ public class World {
 	private int turns; // Amount of turns the player has taken. This should be set when the ball stops.
 
 	public World() {
+		maxGroundedYVelocity = 2;
 		ballVelocity = new Vector2(30.0, 15.0);
-		ballAABB = new AABB(150, 150, 5, 5);
+		ballAABB = new AABB(150, 195, 5, 5);
 		ballLaunchPos = ballAABB.getPos().duplicate();
 		ballBounceFactor = 0.5;
-		ballGravity = 10;
+		ballGravity = 300;
+		ballFriction = 100;
 		terrain = new ArrayList<>();
 		hole = new AABB();
 		isMouseDown = false;
@@ -36,41 +39,35 @@ public class World {
 		ballLaunchMultiplier = 3;
 		turns = 0;
 
-		// terrain.add(new AABB(0, 380, 600, 20)); // floor
-		terrain.add(new AABB(100, 300, 160, 10)); // wall
+		terrain.add(new AABB(0, 200, 174, 20));
+		terrain.add(new AABB(0, 100, 176, 20));
+		terrain.add(new AABB(180, 200, 200, 20));
+		terrain.add(new AABB(0, 100, 100, 300));
+		terrain.add(new AABB(200, 100, 100, 300));
 	}
 
 	public void update(final double DELTA) { // we don't want to accidentally change DELTA so it's final
 
-		if (!waitingForInput) { // replace with while to check for collision later
-			// if (false) { // If ground collider colliding and vel.y < 1
-			// 	ballVelocity.setY(0);
-			// 	// Sign of vel x * (abs (vel x) - friction)
-			// 	ballVelocity.setX(Math.signum(ballVelocity.getX()) * (Math.abs(ballVelocity.getX()) - ballFriction * DELTA));
-			// 	simulateBall(DELTA);
-			// } else {
-			// 	ballVelocity.setY(ballVelocity.getY() + ballGravity * DELTA);
-			// }
+		if (!waitingForInput) {
+			Vector2 groundAabbSize = ballAABB.getSize().add(0, maxGroundedYVelocity * DELTA);
+			AABB groundAabb = new AABB();
+			groundAabb.setSize(groundAabbSize);
+			groundAabb.setPos(ballAABB.getPos());
+			// If ball is near the ground and y velocity is low enough
+			if (groundAabb.isColliding(terrain) && ballVelocity.getY() <= maxGroundedYVelocity) {
+				ballVelocity.setY(0);
+				// This is the new x speed (direction not included) of the ball after friction
+				double newXSpeed = Math.abs(ballVelocity.getX()) - ballFriction * DELTA;
+				if (newXSpeed < 0) // If speed is negative then the friction was greater than the velocity, so we snap it to 0
+					ballVelocity.setX(0);
+				else // Otherwise apply friction normally
+					ballVelocity.setX(
+							Math.signum(ballVelocity.getX()) * newXSpeed);
+			} else {
+				ballVelocity.setY(ballVelocity.getY() + ballGravity * DELTA); // apply gravity
+			}
+
 			simulateBall(DELTA); // if not successful then reset ball to launch position
-
-			// ballVelocity.setY(ballVelocity.getY() + ballGravity); // apply gravity
-			// // Move ball by increments and check for collisions
-			// for (int i = 0; i < MAX_MOVE_ITERATIONS; i++) {
-			// 	integrateBallPos(DELTA / MAX_MOVE_ITERATIONS); // Go 1/10th and then check collision if collision then
-			// 	AABB collider = getBallCollidingAABB();
-			// 	if (collider != null) {
-			// 		integrateBallPos(-DELTA / MAX_MOVE_ITERATIONS);
-			// 		i--;
-			// 		if (ballAABB.getCollisionDirection(collider).getX() != 0) {
-			// 			ballVelocity.setX(-ballVelocity.getX() * ballBounceFactor);
-			// 			System.out.println("x flipped");
-			// 		} else {
-			// 			ballVelocity.setY(-ballVelocity.getY() * ballBounceFactor);
-			// 			System.out.println("y flipped");
-			// 		}
-			// 	}
-			// }
-
 			if (ballVelocity.equals(Vector2.ZERO)) { // stop moving ball if velocity = 0
 				waitingForInput = true;
 			}
@@ -83,12 +80,13 @@ public class World {
 				Vector2 newBallVel = mouseToBall.normalize().multiply(mouseToBall.getLength() * ballLaunchMultiplier);
 				ballVelocity.copy(newBallVel);
 				ballLaunchPos.copy(ballAABB.getPos());
+				ballAABB.getPos().setY(ballAABB.getPos().getY() - maxGroundedYVelocity * DELTA); // Bug fix for ball glitching through floor
 			}
 			if (mousePos.getX() < -1 || mousePos.getY() < -1 || mousePos.getX() > Game.WIDTH + 1
 					|| mousePos.getY() > Game.HEIGHT + 1) {
 				aiming = false;
 			}
-		
+
 			// System.out.println("aiming");
 
 		} else if (mouseJustPressed) {
@@ -102,12 +100,11 @@ public class World {
 
 	// get collision
 	// if collision null
-		// integrate ball remaining delta
-		// return
+	// integrate ball remaining delta
+	// return
 	// integrate ball by col delta
 	// remove col delta from delta
 	// go back to get collision
-
 
 	// The boolean value indicates if the simulation was sucessful or not
 	private boolean simulateBall(double delta) {
@@ -119,10 +116,8 @@ public class World {
 				integrateBallPos(delta);
 				return true;
 			}
-
 			integrateBallPos(collision.DELTA); // move by delta
 			delta -= collision.DELTA;
-			
 			// Flip ball by normal if collision
 			if (collision.NORMAL.getX() != 0) {
 				ballVelocity.setX(-ballVelocity.getX() * ballBounceFactor);
@@ -135,8 +130,7 @@ public class World {
 
 	// Moves the ball by its velocity for delta seconds
 	private void integrateBallPos(double delta) {
-		Vector2 ballPos = ballAABB.getPos();
-		ballPos.copy(ballPos.add(ballVelocity.multiply(delta)));
+		ballAABB.setPos(ballAABB.getPos().add(ballVelocity.multiply(delta)));
 	}
 
 	private AABB.Collision getSweepingBallCollision(double delta) {
@@ -144,12 +138,10 @@ public class World {
 		for (AABB terrainAABB : terrain) {
 			AABB.Collision currentCollision = ballAABB.sweepAABB(terrainAABB, ballVelocity);
 			// Find the collision with the smallest delta
-			// System.out.println(terrainAABB);
-			if (currentCollision != null)
-				System.out.println(currentCollision.DELTA + " " + currentCollision.NORMAL + " " + delta);
-			if (currentCollision != null && currentCollision.DELTA <= delta) {
-				System.out.println("yo");
-				collision = currentCollision;
+			if (currentCollision != null && currentCollision.DELTA <= delta && currentCollision.DELTA > 0) {
+				if (collision == null || collision.DELTA > currentCollision.DELTA) {
+					collision = currentCollision;
+				}
 			}
 		}
 		return collision;
