@@ -13,13 +13,13 @@ public class World {
 	private double ballLaunchMultiplier; // Multiplied by distance between ball and mouse to get magnitude of launch velocity
 	private ArrayList<AABB> terrain;
 	private AABB hole;
-	private boolean isMouseDown; // TODO: Use this variable
+	private boolean isMouseDown;
 	private boolean mouseJustPressed;
 	private boolean mouseJustReleased;
 	private Vector2 mousePos;
 	private boolean waitingForInput;
 	private boolean aiming; // When mouse is held down and mouse is moving around. If mouse goes off screen this turns to false
-	private int turns; // Amount of turns the player has taken. This should be set when the ball stops.
+	private int turns; // TODO: implement this Amount of turns the player has taken. This should be set when the ball stops.
 
 	public World() {
 		maxGroundedYVelocity = 2;
@@ -41,7 +41,7 @@ public class World {
 
 		terrain.add(new AABB(0, 200, 174, 20));
 		terrain.add(new AABB(0, 100, 176, 20));
-		terrain.add(new AABB(180, 200, 200, 20));
+		terrain.add(new AABB(181, 200, 200, 20));
 		terrain.add(new AABB(0, 100, 100, 300));
 		terrain.add(new AABB(200, 100, 100, 300));
 	}
@@ -67,13 +67,19 @@ public class World {
 				ballVelocity.setY(ballVelocity.getY() + ballGravity * DELTA); // apply gravity
 			}
 
-			simulateBall(DELTA); // if not successful then reset ball to launch position
+			// If failed to simulate ball
+			if (!simulateBall(DELTA)) {
+				System.out.println("Ball simulation failed. Resetting to launch position");
+				ballAABB.setPos(ballLaunchPos);
+				ballVelocity.copy(Vector2.ZERO);
+			}
+
 			if (ballVelocity.equals(Vector2.ZERO)) { // stop moving ball if velocity = 0
 				waitingForInput = true;
 			}
 		} else if (aiming) {
-			// If mouse released set aiming to false and waiting for input to true and set ball velocity.
-			if (mouseJustReleased) {
+			// If mouse released set aiming to false and waiting for input to true and launch ball.
+			if (mouseJustReleased || !isMouseDown) {
 				aiming = false;
 				waitingForInput = false;
 				Vector2 mouseToBall = ballAABB.getCenter().subtract(mousePos);
@@ -87,9 +93,7 @@ public class World {
 				aiming = false;
 			}
 
-			// System.out.println("aiming");
-
-		} else if (mouseJustPressed) {
+		} else if (mouseJustPressed || isMouseDown) {
 			aiming = true;
 		}
 
