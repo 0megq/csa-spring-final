@@ -9,6 +9,7 @@ UI
 	- draw par and strokes as text
 	- draw hole with flag
 	- improve launch line aesthetics
+	- show previous launch trajectory
 	- main menu
 		- play button
 		- level select button
