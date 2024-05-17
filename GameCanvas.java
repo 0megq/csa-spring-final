@@ -22,11 +22,13 @@ public class GameCanvas extends JComponent {
 	private ArrayList<AABBDrawer> otherDrawers = new ArrayList<AABBDrawer>();
 	private int elapsedTicks;
 	private World world;
+	private int currentLevel;
 
 	public GameCanvas() {
+		currentLevel = 0;
 		elapsedTicks = 0;
 		// Create world
-		world = initializeWorld(Level.LEVEL1);
+		world = initializeWorld(Level.LEVELS[currentLevel]);
 
 		AABB cursorFollow = new AABB(0, 0, 15, 15);
 
@@ -37,6 +39,12 @@ public class GameCanvas extends JComponent {
 		Timer updateTimer = new Timer(MSPT, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (world.getWaitingForInput() && world.isBallInHole()) {
+					currentLevel++;
+					if (currentLevel >= Level.LEVELS.length) // if no more levels then reset to first level
+						currentLevel = 0;
+					world = initializeWorld(Level.LEVELS[currentLevel]);
+				}
 				// Get the mouse position if the component is showing. Prevents crash when launching game
 				if (isShowing()) {
 					Vector2 screenMouseLoc = new Vector2(MouseInfo.getPointerInfo().getLocation());
@@ -82,14 +90,6 @@ public class GameCanvas extends JComponent {
 
 		worldDrawers = new ArrayList<AABBDrawer>();
 
-		// Get ball aabb from world
-		AABB ballAABB = world.getBallAABB();
-		// Create draw settings for ball
-		AABBDrawSettings ballDrawSettings = new AABBDrawSettings(true, DrawType.FILL, Color.RED);
-		// Create ballDrawer to draw ball
-		AABBDrawer ballDrawer = new AABBDrawer(ballAABB, ballDrawSettings);
-		worldDrawers.add(ballDrawer);
-
 		AABB[] terrain = world.TERRAIN;
 		AABBDrawSettings terrainDrawSettings = new AABBDrawSettings(true, DrawType.BOTH, Color.GREEN,
 				new boolean[] { false, false, false, true }, Color.BLACK, 4);
@@ -97,20 +97,31 @@ public class GameCanvas extends JComponent {
 			worldDrawers.add(new AABBDrawer(aabb, terrainDrawSettings));
 		}
 		AABB hole = world.HOLE;
-		AABB flag = new AABB(hole.getPos().getX() + 3.0, hole.getPos().getY(),
-				hole.getCenter().getX() - hole.getPos().getX() - 3, 300);
-		AABB flagPole = new AABB(hole.getCenter().getX(), hole.getPos().getY() + 20, 2, hole.getPos().getY() - 2);
-		AABBDrawSettings holeDrawSettings = new AABBDrawSettings(true, DrawType.FILL, new Color(0, 0, 255, 120));
+		int poleLength = 30;
+		AABB flagPole = new AABB(hole.getCenter().getX(), hole.getEnd().getY() - poleLength, 2, poleLength);
+		AABB flag = new AABB(flagPole.getPos().getX() - 7, flagPole.getPos().getY(),
+				7, 5);
 		AABBDrawSettings flagPoleDrawSettings = new AABBDrawSettings(true, DrawType.FILL, Color.BLACK);
 		AABBDrawSettings flagDrawSettings = new AABBDrawSettings(true, DrawType.FILL, Color.RED);
-		// worldDrawers.add(new AABBDrawer(flagPole, flagPoleDrawSettings));
-
+		worldDrawers.add(new AABBDrawer(flagPole, flagPoleDrawSettings));
 		worldDrawers.add(new AABBDrawer(flag, flagDrawSettings));
+
+		// Get ball aabb from world
+		AABB ballAABB = world.getBallAABB();
+		// Create draw settings for ball
+		AABBDrawSettings ballDrawSettings = new AABBDrawSettings(true, DrawType.FILL, Color.WHITE);
+		// Create ballDrawer to draw ball
+		AABBDrawer ballDrawer = new AABBDrawer(ballAABB, ballDrawSettings);
+		worldDrawers.add(ballDrawer);
+
 		return world;
 	}
 
 	public void paintComponent(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
+
+		g2.setColor(new Color(152, 234, 250));
+		g2.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
 
 		for (AABBDrawer drawer : worldDrawers) {
 			if (drawer.getShouldDraw()) {

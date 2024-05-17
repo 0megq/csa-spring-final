@@ -41,6 +41,11 @@ public class AABB {
 		return null;
 	}
 
+	public boolean isColliding(Vector2 point) {
+		return point.getX() > pos.getX() && point.getX() < getEnd().getX() && point.getY() > pos.getY()
+				&& point.getY() < getEnd().getY();
+	}
+
 	// Sweep the current aabb to the other AABB with the given velocity and delta. The delta at which the collision occurred is returned.
 	// Will return null if aabbs are inside each other
 	public Collision sweepAABB(AABB other, Vector2 velocity) {
