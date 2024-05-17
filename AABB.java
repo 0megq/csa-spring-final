@@ -33,12 +33,20 @@ public class AABB {
 		return null;
 	}
 
+	public AABB isColliding(AABB[] aabbArray) {
+		for (AABB other : aabbArray) {
+			if (isColliding(other))
+				return other;
+		}
+		return null;
+	}
+
 	// Sweep the current aabb to the other AABB with the given velocity and delta. The delta at which the collision occurred is returned.
 	// Will return null if aabbs are inside each other
 	public Collision sweepAABB(AABB other, Vector2 velocity) {
 		Vector2 segmentStart = pos.duplicate(); // So we don't accidentally change the position
 		AABB paddedAabb = new AABB();
-		paddedAabb.setSize(other.size.add(size.multiply(1))); // Pads the aabb with this.size on top and left.
+		paddedAabb.setSize(other.size.add(size)); // Pads the aabb with this.size on top and left.
 		// Only need to pad top and left because the position is based on top left corner
 		paddedAabb.setPos(other.getPos().subtract(size)); // Adjust position for new padded size.
 

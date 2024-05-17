@@ -1,7 +1,9 @@
 Other
-	- Make the aim only trigger by left click and cancelled by right click
+	0 Make the aim only trigger by left click and cancelled by right click
+	- Make the actual levels
+	0 Reset ball if goes off screen to left, right, and bottom and take a stroke.
 
-Level class (information for how a level is setup)
+0 Level class (information for how a level is setup)
     variables
         - Vector2 ballStart
         - AABB[] ground
@@ -9,10 +11,11 @@ Level class (information for how a level is setup)
         - int par;
 
 UI
-	- draw par and strokes as text
+	0 draw par and strokes as text
 	- draw hole with flag
 	- improve launch line aesthetics
 	- show previous launch trajectory
+	- current menu will be stored and when menu switches the appropriate graphics will switch on and off
 	- main menu
 		- play button
 		- level select button
@@ -32,7 +35,7 @@ Level switching:
 	- if in hole
 		- store strokes if lowest amount for level
 		- if last level
-			- Show congratulations menu
+			- Show congratulations/credits menu
 				- main menu
 				- play again
 				- quit game

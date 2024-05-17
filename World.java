@@ -1,64 +1,69 @@
 import java.awt.event.MouseEvent;
-import java.util.*;
 
 public class World {
-	private static int MAX_SWEEPS_PER_FRAME = 10;
-	private double maxGroundedYVelocity; // the y velocity at which the ball is considered to be grounded
+	private static final double HEIGHT_LIMIT = Game.HEIGHT * 40;
+	private static final AABB BOUNDS = new AABB(0, -HEIGHT_LIMIT, Game.WIDTH, Game.HEIGHT + HEIGHT_LIMIT);
+	private static final int MAX_SWEEPS_PER_FRAME = 10;
+	private static final double MAX_GROUNDED_VELOCITY = 3.0; // the y velocity at which the ball is considered to be grounded
+	private static final int BALL_SIZE = 5;
+	private static final double BALL_BOUNCE_FACTOR = 0.4;
+	private static final double BALL_GRAVITY = 500.0;
+	private static final double BALL_FRICTION = 300.0;
+	private static final double BALL_LAUNCH_MULTIPLIER = 4.0; // Multiplied by distance between ball and mouse to get magnitude of launch velocity
+	public final AABB[] TERRAIN;
+	public final AABB HOLE;
+	public final int PAR;
 	private AABB ballAABB;
 	private Vector2 ballLaunchPos; // Position of ball when it is launched. We use this in case the physics simulation fails and we need to reset.
 	private Vector2 ballVelocity;
-	private double ballBounceFactor;
-	private double ballGravity;
-	private double ballFriction;
-	private double ballLaunchMultiplier; // Multiplied by distance between ball and mouse to get magnitude of launch velocity
-	private ArrayList<AABB> terrain;
-	private AABB hole;
-	private boolean isMouseDown;
-	private boolean mouseJustPressed;
-	private boolean mouseJustReleased;
+	private boolean isLeftMouseDown;
+	private boolean leftMouseJustPressed;
+	private boolean leftMouseJustReleased;
+	private boolean isRightMouseDown;
+	private boolean rightMouseJustPressed;
+	private boolean rightMouseJustReleased;
 	private Vector2 mousePos;
 	private boolean waitingForInput;
+	private Vector2 aimStartPos;
 	private boolean aiming; // When mouse is held down and mouse is moving around. If mouse goes off screen this turns to false
 	private int strokes; // Amount of turns the player has taken. Doesn't count failed ball simulations
 
-	public World() {
-		maxGroundedYVelocity = 4;
-		ballVelocity = new Vector2(30.0, 15.0);
-		ballAABB = new AABB(150, 195, 5, 5);
-		ballLaunchPos = ballAABB.getPos().duplicate();
-		ballBounceFactor = 0.4;
-		ballGravity = 300;
-		ballFriction = 100;
-		terrain = new ArrayList<AABB>();
-		hole = new AABB();
-		isMouseDown = false;
-		mouseJustPressed = false;
-		mouseJustReleased = false;
-		mousePos = new Vector2();
-		waitingForInput = true;
-		ballLaunchMultiplier = 4.0;
+	public World(Level level) {
+		// Load level data into instance fields
+		ballAABB = new AABB(level.BALL_START, Vector2.ONE.multiply(BALL_SIZE));
+		TERRAIN = level.TERRAIN;
+		HOLE = level.HOLE;
+		PAR = level.PAR;
+		// Other instance fields
 		strokes = 0;
-
-		terrain.add(new AABB(0, 200, 174, 20));
-		terrain.add(new AABB(0, 100, 176, 20));
-		terrain.add(new AABB(181, 200, 200, 20));
-		terrain.add(new AABB(0, 100, 100, 300));
-		terrain.add(new AABB(200, 100, 100, 300));
+		ballVelocity = new Vector2();
+		ballLaunchPos = ballAABB.getPos().duplicate();
+		// Input
+		aimStartPos = new Vector2();
+		aiming = false;
+		isLeftMouseDown = false;
+		leftMouseJustPressed = false;
+		leftMouseJustReleased = false;
+		isRightMouseDown = false;
+		rightMouseJustPressed = false;
+		rightMouseJustReleased = false;
+		mousePos = new Vector2();
+		waitingForInput = false;
 	}
 
 	public void update(final double DELTA) { // we don't want to accidentally change DELTA so it's final
 
 		if (!waitingForInput) {
-			Vector2 groundAabbSize = ballAABB.getSize().add(0, maxGroundedYVelocity * DELTA);
+			Vector2 groundAabbSize = ballAABB.getSize().add(0, MAX_GROUNDED_VELOCITY * DELTA);
 			AABB groundAabb = new AABB();
 			groundAabb.setSize(groundAabbSize);
 			groundAabb.setPos(ballAABB.getPos());
-			AABB groundCollider = groundAabb.isColliding(terrain);
+			AABB groundCollider = groundAabb.isColliding(TERRAIN);
 			// If ball is near the ground and y velocity is low enough
-			if (groundCollider != null && ballVelocity.getY() <= maxGroundedYVelocity) {
+			if (groundCollider != null && ballVelocity.getY() <= MAX_GROUNDED_VELOCITY) {
 				ballVelocity.setY(0);
 				// This is the new x speed (direction not included) of the ball after friction
-				double newXSpeed = Math.abs(ballVelocity.getX()) - ballFriction * DELTA;
+				double newXSpeed = Math.abs(ballVelocity.getX()) - BALL_FRICTION * DELTA;
 				if (newXSpeed < 0) // If speed is negative then the friction was greater than the velocity, so we snap it to 0
 					ballVelocity.setX(0);
 				else // Otherwise apply friction normally
@@ -66,8 +71,12 @@ public class World {
 							Math.signum(ballVelocity.getX()) * newXSpeed);
 				// Snap ball y position to floor
 				ballAABB.getPos().setY(groundCollider.getPos().getY() - ballAABB.getSize().getY());
+
+				if (ballVelocity.equals(Vector2.ZERO)) { // stop moving ball if velocity = 0 and on ground
+					waitingForInput = true;
+				}
 			} else {
-				ballVelocity.setY(ballVelocity.getY() + ballGravity * DELTA); // apply gravity
+				ballVelocity.setY(ballVelocity.getY() + BALL_GRAVITY * DELTA); // apply gravity
 			}
 
 			// If failed to simulate ball
@@ -78,33 +87,39 @@ public class World {
 				strokes--; // Remove a stroke if ball simulation failed
 			}
 
-			if (ballVelocity.equals(Vector2.ZERO)) { // stop moving ball if velocity = 0
-				waitingForInput = true;
+			// If ball goes beyond bounds then reset ball and don't remove a stroke
+			if (!ballAABB.isColliding(BOUNDS)) {
+				ballAABB.setPos(ballLaunchPos);
+				ballVelocity.copy(Vector2.ZERO);
 			}
 		} else if (aiming) {
 			// If mouse released set aiming to false and waiting for input to true and launch ball.
-			if (mouseJustReleased) {
+			if (leftMouseJustReleased) {
 				aiming = false;
 				waitingForInput = false;
-				Vector2 mouseToBall = ballAABB.getCenter().subtract(mousePos);
-				Vector2 newBallVel = mouseToBall.normalize().multiply(mouseToBall.getLength() * ballLaunchMultiplier);
+				Vector2 mouseToStart = aimStartPos.subtract(mousePos);
+				Vector2 newBallVel = mouseToStart.normalize()
+						.multiply(mouseToStart.getLength() * BALL_LAUNCH_MULTIPLIER);
 				strokes++;
 				ballVelocity.copy(newBallVel);
 				ballLaunchPos.copy(ballAABB.getPos());
-				ballAABB.getPos().setY(ballAABB.getPos().getY() - maxGroundedYVelocity * DELTA); // Bug fix for ball glitching through floor
+				ballAABB.getPos().setY(ballAABB.getPos().getY() - MAX_GROUNDED_VELOCITY * DELTA); // Bug fix for ball glitching through floor
 			}
 			if (mousePos.getX() < -1 || mousePos.getY() < -1 || mousePos.getX() > Game.WIDTH + 1
-					|| mousePos.getY() > Game.HEIGHT + 1) {
+					|| mousePos.getY() > Game.HEIGHT + 1 || rightMouseJustPressed) {
 				aiming = false;
 			}
 
-		} else if (mouseJustPressed) {
+		} else if (leftMouseJustPressed) {
+			aimStartPos.copy(mousePos);
 			aiming = true;
 		}
 
 		// These should be at end of the update function
-		mouseJustPressed = false;
-		mouseJustReleased = false;
+		leftMouseJustPressed = false;
+		leftMouseJustReleased = false;
+		rightMouseJustPressed = false;
+		rightMouseJustReleased = false;
 	}
 
 	// get collision
@@ -129,9 +144,9 @@ public class World {
 			delta -= collision.DELTA;
 			// Flip ball by normal if collision
 			if (collision.NORMAL.getX() != 0) {
-				ballVelocity.setX(-ballVelocity.getX() * ballBounceFactor);
+				ballVelocity.setX(-ballVelocity.getX() * BALL_BOUNCE_FACTOR);
 			} else if (collision.NORMAL.getY() != 0) {
-				ballVelocity.setY(-ballVelocity.getY() * ballBounceFactor);
+				ballVelocity.setY(-ballVelocity.getY() * BALL_BOUNCE_FACTOR);
 			}
 		}
 		return false;
@@ -143,12 +158,12 @@ public class World {
 	}
 
 	private boolean isBallInHole() {
-		return ballAABB.isColliding(hole);
+		return ballAABB.isColliding(HOLE);
 	}
 
 	private AABB.Collision getSweepingBallCollision(double delta) {
 		AABB.Collision collision = null;
-		for (AABB terrainAABB : terrain) {
+		for (AABB terrainAABB : TERRAIN) {
 			AABB.Collision currentCollision = ballAABB.sweepAABB(terrainAABB, ballVelocity);
 			// Find the collision with the smallest delta
 			if (currentCollision != null && currentCollision.DELTA <= delta && currentCollision.DELTA > 0) {
@@ -161,37 +176,45 @@ public class World {
 	}
 
 	public void mousePressed(MouseEvent e) {
-		mouseJustPressed = true;
-		isMouseDown = true;
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			leftMouseJustPressed = true;
+			isLeftMouseDown = true;
+		}
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			rightMouseJustPressed = true;
+			isRightMouseDown = true;
+		}
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		mouseJustReleased = true;
-		isMouseDown = false;
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			leftMouseJustReleased = true;
+			isLeftMouseDown = false;
+		}
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			rightMouseJustReleased = true;
+			isRightMouseDown = false;
+		}
 	}
 
 	public void setMousePosition(Vector2 pos) {
 		mousePos.copy(pos);
 	}
 
-	public void setBallAABB(AABB aabb) {
-		this.ballAABB = aabb;
+	public int getStrokes() {
+		return strokes;
 	}
 
-	public void setTerrain(ArrayList<AABB> terrain) {
-		this.terrain = terrain;
-	}
-
-	public void setHole(AABB hole) {
-		this.hole = hole;
-	}
-
-	public void addTerrain(AABB box) {
-		terrain.add(box);
+	public Vector2 getAimStartPos() {
+		return aimStartPos;
 	}
 
 	public AABB getBallAABB() {
 		return ballAABB;
+	}
+
+	public boolean getWaitingForInput() {
+		return waitingForInput;
 	}
 
 	public boolean isAiming() {
@@ -200,13 +223,5 @@ public class World {
 
 	public Vector2 getMousePos() {
 		return mousePos;
-	}
-
-	public ArrayList<AABB> getTerrain() {
-		return terrain;
-	}
-
-	public AABB getHole() {
-		return hole;
 	}
 }
