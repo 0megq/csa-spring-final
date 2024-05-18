@@ -20,11 +20,23 @@ public class GameCanvas extends JComponent {
 
 	private ArrayList<AABBDrawer> worldDrawers = new ArrayList<AABBDrawer>();
 	private ArrayList<AABBDrawer> otherDrawers = new ArrayList<AABBDrawer>();
+	private ButtonDrawer butDrawer;
 	private int elapsedTicks;
 	private World world;
 	private int currentLevel;
+	private Vector2 mousePos;
+	private boolean mouseDown;
 
 	public GameCanvas() {
+		mousePos = new Vector2();
+		mouseDown = false;
+
+		Button but = new Button(30, 90, 80, 60, "press me!",
+				new AABBDrawSettings(true, DrawType.FILL, Color.GREEN),
+				new AABBDrawSettings(true, DrawType.FILL, Color.BLUE),
+				new AABBDrawSettings(true, DrawType.FILL, Color.GRAY));
+		butDrawer = new ButtonDrawer(but);
+
 		currentLevel = 0;
 		elapsedTicks = 0;
 		// Create world
@@ -49,10 +61,11 @@ public class GameCanvas extends JComponent {
 				if (isShowing()) {
 					Vector2 screenMouseLoc = new Vector2(MouseInfo.getPointerInfo().getLocation());
 					Vector2 componentLoc = new Vector2(getLocationOnScreen());
-					Vector2 mousePos = screenMouseLoc.subtract(componentLoc);
+					mousePos = screenMouseLoc.subtract(componentLoc);
 					world.setMousePosition(mousePos);
 					cursorFollow.setCenter(mousePos);
 				}
+				but.update(mousePos, mouseDown);
 
 				// Update world
 				world.update(DELTA);
@@ -70,11 +83,13 @@ public class GameCanvas extends JComponent {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				world.mousePressed(e);
+				mouseDown = true;
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				world.mouseReleased(e);
+				mouseDown = false;
 			}
 		});
 	}
@@ -148,6 +163,8 @@ public class GameCanvas extends JComponent {
 				drawer.draw(g2);
 			}
 		}
+
+		butDrawer.draw(g2, g2.getFontMetrics());
 
 		g2.setColor(Color.BLACK);
 		g2.drawString("Par: " + world.PAR, 10, 10);

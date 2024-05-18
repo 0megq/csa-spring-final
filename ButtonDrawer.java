@@ -1,14 +1,16 @@
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
-public class AABBDrawer {
+public class ButtonDrawer {
+	private static final int TEXT_Y_ADJUST = 3; // pixels to adjust the text y position by. This helps it to look more centered
 	private boolean shouldDraw;
-	private AABB aabb;
+	private Button button;
 	private AABBDrawSettings drawSettings;
 
-	public AABBDrawer(AABB aabb, AABBDrawSettings drawSettings) {
-		this.aabb = aabb;
-		this.drawSettings = drawSettings;
+	public ButtonDrawer(Button button) {
+		this.button = button;
 		this.shouldDraw = true;
+		this.drawSettings = button.getDrawSettings();
 	}
 
 	public void setShouldDraw(boolean shouldDraw) {
@@ -19,7 +21,8 @@ public class AABBDrawer {
 		return shouldDraw;
 	}
 
-	public void draw(Graphics2D g) {
+	// I made fontMetrics an argument so we don't need to call g.getFontMetrics for every single call to this function
+	public void draw(Graphics2D g, FontMetrics fontMetrics) {
 		if (!drawSettings.getVisible())
 			return;
 		switch (drawSettings.getDrawType()) {
@@ -34,22 +37,35 @@ public class AABBDrawer {
 				outline(g);
 				break;
 		}
+		String text = button.getText();
+		g.setColor(Color.BLACK); // All buttons will have black text and same font size
+
+		Rectangle2D textRect = fontMetrics.getStringBounds(text, g);
+
+		Vector2 butPos = button.getPos();
+		Vector2 butSize = button.getSize();
+
+		double textX = butPos.getX() + (butSize.getX() - textRect.getWidth()) / 2;
+		double textY = button.getEnd().getY() - (butSize.getY() - textRect.getHeight()) / 2 - TEXT_Y_ADJUST;
+		// g.drawRect((int) textX, (int) (textY - textRect.getWidth()), (int) textRect.getWidth(),
+		// 		(int) textRect.getHeight());
+		g.drawString(text, (int) textX, (int) textY);
 	}
 
 	private void fill(Graphics2D g) {
 		g.setColor(drawSettings.getFillColor());
-		g.fillRect((int) aabb.getPos().getX(), (int) aabb.getPos().getY(), (int) aabb.getSize().getX(),
-				(int) aabb.getSize().getY());
+		g.fillRect((int) button.getPos().getX(), (int) button.getPos().getY(), (int) button.getSize().getX(),
+				(int) button.getSize().getY());
 	}
 
 	private void outline(Graphics2D g) {
 		g.setColor(drawSettings.getOutlineColor());
 
-		Vector2 pos = aabb.getPos();
+		Vector2 pos = button.getPos();
 		int x = (int) pos.getX();
 		int y = (int) pos.getY();
 
-		Vector2 size = aabb.getSize();
+		Vector2 size = button.getSize();
 		int w = (int) size.getX();
 		int h = (int) size.getY();
 

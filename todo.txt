@@ -12,7 +12,7 @@ Other
 
 UI
 	0 draw par and strokes as text
-	- draw hole with flag
+	0 draw hole with flag
 	- improve launch line aesthetics
 	- show previous launch trajectory
 	- current menu will be stored and when menu switches the appropriate graphics will switch on and off
@@ -29,6 +29,18 @@ UI
 		- resume
 		- main menu
 		- quit
+
+Button class
+	variables
+		- extends AABB or has an AABB instance field
+		- String text
+		- AABB Draw Settings
+	functions
+		- update (mousePos, leftClickReleased, leftClickDown)
+			- change draw settings to match mouse pos and mouse click status
+			- return if pressed or not
+			- based on that the code will do something, such as quit level or next level or unpause game
+
 
 Level switching:
 	- call isBallInHole
