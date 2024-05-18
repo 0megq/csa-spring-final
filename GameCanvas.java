@@ -21,6 +21,7 @@ public class GameCanvas extends JComponent {
 	private ArrayList<AABBDrawer> worldDrawers = new ArrayList<AABBDrawer>();
 	private ArrayList<AABBDrawer> otherDrawers = new ArrayList<AABBDrawer>();
 	private ButtonDrawer butDrawer;
+	private ButtonDrawer[] mainButtonDrawers;
 	private int elapsedTicks;
 	private World world;
 	private int currentLevel;
@@ -31,6 +32,7 @@ public class GameCanvas extends JComponent {
 	private boolean rightMouseJustPressed;
 	private boolean rightMouseJustReleased;
 	private Vector2 mousePos;
+	private Menu currentMenu;
 
 	public GameCanvas() {
 		leftMousePressed = false;
@@ -42,14 +44,23 @@ public class GameCanvas extends JComponent {
 		mousePos = new Vector2();
 		currentLevel = 0;
 		elapsedTicks = 0;
+		currentMenu = Menu.MAIN;
 
 		// Create world
 		world = initializeWorld(Level.LEVELS[currentLevel]);
 
 		// Menus
 		// Main menu
-		// Button mainPlayButton = new Button();
-		// Button mainQuitButton = new Button(, , , , , null, null, null);
+		Button mainPlayButton = new Button(250, 100, 100, 50, "Play!",
+				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
+		Button mainQuitButton = new Button(250, 170, 100, 50, "Quit",
+				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
+
+		mainButtonDrawers = new ButtonDrawer[] { new ButtonDrawer(mainPlayButton), new ButtonDrawer(mainQuitButton) };
 
 		Button but = new Button(30, 90, 80, 51, "press me!",
 				new AABBDrawSettings(true, DrawType.FILL, Color.GREEN),
@@ -79,7 +90,9 @@ public class GameCanvas extends JComponent {
 					mousePos = screenMouseLoc.subtract(componentLoc);
 					cursorFollow.setCenter(mousePos);
 				}
-				but.update(mousePos, leftMousePressed, leftMouseJustReleased, leftMouseJustPressed);
+
+				mainPlayButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+				mainQuitButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
 
 				// Update world
 				world.updateInput(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased,
@@ -126,6 +139,10 @@ public class GameCanvas extends JComponent {
 				}
 			}
 		});
+	}
+
+	public void changeMenu(Menu newMenu) {
+		// this is here if i need it. i dont need now, but maybe i will later
 	}
 
 	// TODO implement this
@@ -198,15 +215,20 @@ public class GameCanvas extends JComponent {
 			}
 		}
 
-		butDrawer.draw(g2, g2.getFontMetrics());
+		FontMetrics fontMetrics = g2.getFontMetrics();
+		for (ButtonDrawer drawer : mainButtonDrawers) {
+			if (drawer.getShouldDraw()) {
+				drawer.draw(g2, fontMetrics);
+			}
+		}
 
 		g2.setColor(Color.BLACK);
 		g2.drawString("Par: " + world.PAR, 10, 20);
 		g2.drawString("Stroke: " + world.getStrokes(), 530, 20);
 		if (world.isAiming()) {
-			g2.drawString("Right Click to Cancel", 175, 20);
+			g2.drawString("Right Click to Cancel", 245, 20);
 		} else if (world.getWaitingForInput()) {
-			g2.drawString("Ready for input", 180, 20);
+			g2.drawString("Ready for input", 255, 20);
 		}
 
 		// Draw border around screen

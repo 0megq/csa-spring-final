@@ -24,8 +24,8 @@ public class Button extends AABB {
 		this.currentDrawSettings = NORMAL_DRAW_SETTINGS.duplicate();
 	}
 
-	public void update(Vector2 mousePos, boolean leftMousePressed, boolean leftMouseJustReleased,
-			boolean leftMouseJustPressed) {
+	public void update(Vector2 mousePos, boolean leftMousePressed, boolean leftMouseJustPressed,
+			boolean leftMouseJustReleased) {
 		if (isColliding(mousePos)) {
 			if (leftMouseJustReleased) {
 				latestStatus = Status.RELEASED;
