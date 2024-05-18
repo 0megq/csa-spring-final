@@ -16,10 +16,10 @@ public class World {
 	private AABB ballAABB;
 	private Vector2 ballLaunchPos; // Position of ball when it is launched. We use this in case the physics simulation fails and we need to reset.
 	private Vector2 ballVelocity;
-	private boolean isLeftMouseDown;
+	private boolean leftMousePressed;
 	private boolean leftMouseJustPressed;
 	private boolean leftMouseJustReleased;
-	private boolean isRightMouseDown;
+	private boolean rightMousePressed;
 	private boolean rightMouseJustPressed;
 	private boolean rightMouseJustReleased;
 	private Vector2 mousePos;
@@ -41,18 +41,28 @@ public class World {
 		// Input
 		aimStartPos = new Vector2();
 		aiming = false;
-		isLeftMouseDown = false;
+		leftMousePressed = false;
 		leftMouseJustPressed = false;
 		leftMouseJustReleased = false;
-		isRightMouseDown = false;
+		rightMousePressed = false;
 		rightMouseJustPressed = false;
 		rightMouseJustReleased = false;
-		mousePos = new Vector2();
 		waitingForInput = false;
+		mousePos = new Vector2();
+	}
+
+	public void updateInput(Vector2 mousePos, boolean lmbPressed, boolean lmbJustPressed, boolean lmbJustReleased,
+			boolean rmbPressed, boolean rmbJustPressed, boolean rmbJustReleased) {
+		this.mousePos = mousePos;
+		this.leftMousePressed = lmbPressed;
+		this.leftMouseJustPressed = lmbJustPressed;
+		this.leftMouseJustReleased = lmbJustReleased;
+		this.rightMousePressed = rmbPressed;
+		this.rightMouseJustPressed = rmbJustPressed;
+		this.rightMouseJustReleased = rmbJustReleased;
 	}
 
 	public void update(final double DELTA) { // we don't want to accidentally change DELTA so it's final
-
 		if (!waitingForInput) {
 			Vector2 groundAabbSize = ballAABB.getSize().add(0, MAX_GROUNDED_VELOCITY * DELTA);
 			AABB groundAabb = new AABB();
@@ -114,12 +124,6 @@ public class World {
 			aimStartPos.copy(mousePos);
 			aiming = true;
 		}
-
-		// These should be at end of the update function
-		leftMouseJustPressed = false;
-		leftMouseJustReleased = false;
-		rightMouseJustPressed = false;
-		rightMouseJustReleased = false;
 	}
 
 	// get collision
@@ -173,32 +177,6 @@ public class World {
 			}
 		}
 		return collision;
-	}
-
-	public void mousePressed(MouseEvent e) {
-		if (e.getButton() == MouseEvent.BUTTON1) {
-			leftMouseJustPressed = true;
-			isLeftMouseDown = true;
-		}
-		if (e.getButton() == MouseEvent.BUTTON3) {
-			rightMouseJustPressed = true;
-			isRightMouseDown = true;
-		}
-	}
-
-	public void mouseReleased(MouseEvent e) {
-		if (e.getButton() == MouseEvent.BUTTON1) {
-			leftMouseJustReleased = true;
-			isLeftMouseDown = false;
-		}
-		if (e.getButton() == MouseEvent.BUTTON3) {
-			rightMouseJustReleased = true;
-			isRightMouseDown = false;
-		}
-	}
-
-	public void setMousePosition(Vector2 pos) {
-		mousePos.copy(pos);
 	}
 
 	public int getStrokes() {

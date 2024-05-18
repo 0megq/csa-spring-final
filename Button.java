@@ -21,15 +21,15 @@ public class Button extends AABB {
 		this.DOWN_DRAW_SETTINGS = downDrawSettings;
 		this.text = text;
 		this.latestStatus = Status.NORMAL;
-		this.currentDrawSettings = NORMAL_DRAW_SETTINGS;
+		this.currentDrawSettings = NORMAL_DRAW_SETTINGS.duplicate();
 	}
 
-	public void update(Vector2 mousePos, boolean leftClickDown) {
+	public void update(Vector2 mousePos, boolean leftMousePressed, boolean leftMouseJustReleased,
+			boolean leftMouseJustPressed) {
 		if (isColliding(mousePos)) {
-			if (!leftClickDown && latestStatus == Status.DOWN) {
-				currentDrawSettings.copy(NORMAL_DRAW_SETTINGS); // NORMAL and RELEASED status should share the same visuals
+			if (leftMouseJustReleased) {
 				latestStatus = Status.RELEASED;
-			} else if (leftClickDown) {
+			} else if (latestStatus == Status.DOWN || leftMouseJustPressed) {
 				currentDrawSettings.copy(DOWN_DRAW_SETTINGS);
 				latestStatus = Status.DOWN;
 			} else {

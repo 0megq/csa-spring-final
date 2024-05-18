@@ -42,6 +42,19 @@ Button class
 			- based on that the code will do something, such as quit level or next level or unpause game
 
 
+Menu class
+	description
+		stores information about its buttons, aabbs, and other graphics it needs to draw. Responds appropriately to each button press
+	variables
+		buttons
+		aabbs
+
+	functions
+		update()
+			- this will call the buttons update()
+		some way of getting signals from the menus buttons to do things in the game
+
+
 Level switching:
 	- call isBallInHole
 	- if in hole

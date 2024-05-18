@@ -24,23 +24,38 @@ public class GameCanvas extends JComponent {
 	private int elapsedTicks;
 	private World world;
 	private int currentLevel;
+	private boolean leftMousePressed;
+	private boolean leftMouseJustPressed;
+	private boolean leftMouseJustReleased;
+	private boolean rightMousePressed;
+	private boolean rightMouseJustPressed;
+	private boolean rightMouseJustReleased;
 	private Vector2 mousePos;
-	private boolean mouseDown;
 
 	public GameCanvas() {
+		leftMousePressed = false;
+		leftMouseJustPressed = false;
+		leftMouseJustReleased = false;
+		rightMousePressed = false;
+		rightMouseJustPressed = false;
+		rightMouseJustReleased = false;
 		mousePos = new Vector2();
-		mouseDown = false;
+		currentLevel = 0;
+		elapsedTicks = 0;
 
-		Button but = new Button(30, 90, 80, 60, "press me!",
+		// Create world
+		world = initializeWorld(Level.LEVELS[currentLevel]);
+
+		// Menus
+		// Main menu
+		// Button mainPlayButton = new Button();
+		// Button mainQuitButton = new Button(, , , , , null, null, null);
+
+		Button but = new Button(30, 90, 80, 51, "press me!",
 				new AABBDrawSettings(true, DrawType.FILL, Color.GREEN),
 				new AABBDrawSettings(true, DrawType.FILL, Color.BLUE),
 				new AABBDrawSettings(true, DrawType.FILL, Color.GRAY));
 		butDrawer = new ButtonDrawer(but);
-
-		currentLevel = 0;
-		elapsedTicks = 0;
-		// Create world
-		world = initializeWorld(Level.LEVELS[currentLevel]);
 
 		AABB cursorFollow = new AABB(0, 0, 15, 15);
 
@@ -51,28 +66,35 @@ public class GameCanvas extends JComponent {
 		Timer updateTimer = new Timer(MSPT, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (world.getWaitingForInput() && world.isBallInHole()) {
-					currentLevel++;
-					if (currentLevel >= Level.LEVELS.length) // if no more levels then reset to first level
-						currentLevel = 0;
-					world = initializeWorld(Level.LEVELS[currentLevel]);
-				}
+				// if (world.getWaitingForInput() && world.isBallInHole()) {
+				// 	currentLevel++;
+				// 	if (currentLevel >= Level.LEVELS.length) // if no more levels then reset to first level
+				// 		currentLevel = 0;
+				// 	world = initializeWorld(Level.LEVELS[currentLevel]);
+				// }
 				// Get the mouse position if the component is showing. Prevents crash when launching game
 				if (isShowing()) {
 					Vector2 screenMouseLoc = new Vector2(MouseInfo.getPointerInfo().getLocation());
 					Vector2 componentLoc = new Vector2(getLocationOnScreen());
 					mousePos = screenMouseLoc.subtract(componentLoc);
-					world.setMousePosition(mousePos);
 					cursorFollow.setCenter(mousePos);
 				}
-				but.update(mousePos, mouseDown);
+				but.update(mousePos, leftMousePressed, leftMouseJustReleased, leftMouseJustPressed);
 
 				// Update world
+				world.updateInput(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased,
+						rightMousePressed, rightMouseJustPressed, rightMouseJustReleased);
 				world.update(DELTA);
 				// Draw call
 				repaint();
 				// Increase ticks
 				elapsedTicks += 1;
+
+				// These should be at end of the update function
+				leftMouseJustPressed = false;
+				leftMouseJustReleased = false;
+				rightMouseJustPressed = false;
+				rightMouseJustReleased = false;
 			}
 		});
 		// Start game update cycle
@@ -82,14 +104,26 @@ public class GameCanvas extends JComponent {
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				world.mousePressed(e);
-				mouseDown = true;
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					leftMouseJustPressed = true;
+					rightMousePressed = true;
+				}
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					rightMouseJustPressed = true;
+					rightMousePressed = true;
+				}
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				world.mouseReleased(e);
-				mouseDown = false;
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					leftMouseJustReleased = true;
+					leftMousePressed = false;
+				}
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					rightMouseJustReleased = true;
+					rightMousePressed = false;
+				}
 			}
 		});
 	}
@@ -167,12 +201,17 @@ public class GameCanvas extends JComponent {
 		butDrawer.draw(g2, g2.getFontMetrics());
 
 		g2.setColor(Color.BLACK);
-		g2.drawString("Par: " + world.PAR, 10, 10);
-		g2.drawString("Stroke: " + world.getStrokes(), 530, 10);
+		g2.drawString("Par: " + world.PAR, 10, 20);
+		g2.drawString("Stroke: " + world.getStrokes(), 530, 20);
 		if (world.isAiming()) {
-			g2.drawString("Right Click to Cancel", 175, 10);
+			g2.drawString("Right Click to Cancel", 175, 20);
 		} else if (world.getWaitingForInput()) {
-			g2.drawString("Ready for input", 180, 10);
+			g2.drawString("Ready for input", 180, 20);
 		}
+
+		// Draw border around screen
+		g2.setColor(Color.GRAY);
+		g2.setStroke(new BasicStroke(3));
+		g2.drawRect(1, 1, Game.WIDTH - 3, Game.HEIGHT - 3);
 	}
 }
