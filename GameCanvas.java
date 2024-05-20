@@ -120,16 +120,22 @@ public class GameCanvas extends JComponent {
 						mainPlayButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
 						mainTutorialButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
 						mainQuitButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
-						if (mainTutorialButton.getStatus() == Button.Status.PRESSED)
+						if (mainTutorialButton.getStatus() == Button.Status.PRESSED) {
 							mainTutorialTextVisible = !mainTutorialTextVisible;
-						if (mainPlayButton.getStatus() == Button.Status.RELEASED)
+						}
+						if (mainPlayButton.getStatus() == Button.Status.RELEASED) {
 							world = initializeWorld(Level.LEVELS[currentLevel]);
 							currentMenu = Menu.NONE;
+						}
+						if (mainQuitButton.getStatus() == Button.Status.RELEASED) {
+							currentMenu = Menu.NONE;
+						}
 						break;
 					case PAUSE:
 						pauseResumeButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
 						pauseMainMenuButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
 						pauseQuitButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+						if (pauseResumeButton.getStatus() == Button.Status)
 						break;
 					case LEVEL_SELECT:
 						break;
@@ -229,35 +235,7 @@ public class GameCanvas extends JComponent {
 
 		switch (currentMenu) {
 			case NONE:
-				g2.setColor(new Color(152, 234, 250));
-				g2.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
-
-				for (AABBDrawer drawer : worldDrawers) {
-					if (drawer.getShouldDraw()) {
-						drawer.draw(g2);
-					}
-				}
-
-				// aiming line
-				if (world.isAiming()) {
-					g2.setColor(Color.BLACK);
-					g2.setStroke(new BasicStroke(aimLineWidth));
-					Vector2 ballPos = world.getBallAABB().getCenter();
-					Vector2 startPos = world.getAimStartPos();
-					Vector2 mousePos = world.getMousePos();
-					Vector2 directionPos = ballPos.add(startPos.subtract(mousePos));
-					g2.drawLine((int) ballPos.getX(), (int) ballPos.getY(), (int) directionPos.getX(),
-							(int) directionPos.getY());
-					g2.drawLine((int) startPos.getX(), (int) startPos.getY(), (int) mousePos.getX(), (int) mousePos.getY());
-				}
-
-				g2.drawString("Par: " + world.PAR, 10, 20);
-				g2.drawString("Stroke: " + world.getStrokes(), 530, 20);
-				if (world.isAiming()) {
-					g2.drawString("Right Click to Cancel", 245, 20);
-				} else if (world.getWaitingForInput()) {
-					g2.drawString("Ready for input", 255, 20);
-				}
+				drawWorld(g2);
 				break;
 			case MAIN:
 				FontMetrics fontMetrics = g2.getFontMetrics();
@@ -270,6 +248,7 @@ public class GameCanvas extends JComponent {
 					g2.drawString("This is a tutorial\n       Hello!", 360, 180);
 				break;
 			case PAUSE:
+				drawWorld(g2);
 				fontMetrics = g2.getFontMetrics();
 				for (ButtonDrawer drawer : pauseButtonDrawers) {
 					if (drawer.getShouldDraw()) {
@@ -298,5 +277,37 @@ public class GameCanvas extends JComponent {
 		g2.setColor(Color.GRAY);
 		g2.setStroke(new BasicStroke(3));
 		g2.drawRect(1, 1, Game.WIDTH - 3, Game.HEIGHT - 3);
+	}
+
+	private void drawWorld(Graphics2D g2) {
+		g2.setColor(new Color(120, 200, 220));
+		g2.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
+
+		for (AABBDrawer drawer : worldDrawers) {
+			if (drawer.getShouldDraw()) {
+				drawer.draw(g2);
+			}
+		}
+
+		// aiming line
+		if (world.isAiming()) {
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(aimLineWidth));
+			Vector2 ballPos = world.getBallAABB().getCenter();
+			Vector2 startPos = world.getAimStartPos();
+			Vector2 mousePos = world.getMousePos();
+			Vector2 directionPos = ballPos.add(startPos.subtract(mousePos));
+			g2.drawLine((int) ballPos.getX(), (int) ballPos.getY(), (int) directionPos.getX(),
+					(int) directionPos.getY());
+			g2.drawLine((int) startPos.getX(), (int) startPos.getY(), (int) mousePos.getX(), (int) mousePos.getY());
+		}
+
+		g2.drawString("Par: " + world.PAR, 10, 20);
+		g2.drawString("Stroke: " + world.getStrokes(), 530, 20);
+		if (world.isAiming()) {
+			g2.drawString("Right Click to Cancel", 245, 20);
+		} else if (world.getWaitingForInput()) {
+			g2.drawString("Ready for input", 255, 20);
+		}
 	}
 }
