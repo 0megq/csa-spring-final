@@ -1,5 +1,3 @@
-import java.awt.event.MouseEvent;
-
 public class World {
 	private static final double HEIGHT_LIMIT = Game.HEIGHT * 40;
 	private static final AABB BOUNDS = new AABB(0, -HEIGHT_LIMIT, Game.WIDTH, Game.HEIGHT + HEIGHT_LIMIT);

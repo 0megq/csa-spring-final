@@ -2,6 +2,7 @@ public class Button extends AABB {
 	enum Status {
 		NORMAL,
 		HOVERED,
+		PRESSED,
 		DOWN,
 		RELEASED,
 	}
@@ -11,7 +12,7 @@ public class Button extends AABB {
 	private final AABBDrawSettings DOWN_DRAW_SETTINGS;
 	private String text;
 	private AABBDrawSettings currentDrawSettings;
-	private Status latestStatus;
+	private Status status;
 
 	public Button(int x, int y, int w, int h, String text, AABBDrawSettings normalDrawSettings,
 			AABBDrawSettings hoverDrawSettings, AABBDrawSettings downDrawSettings) {
@@ -20,7 +21,7 @@ public class Button extends AABB {
 		this.HOVER_DRAW_SETTINGS = hoverDrawSettings;
 		this.DOWN_DRAW_SETTINGS = downDrawSettings;
 		this.text = text;
-		this.latestStatus = Status.NORMAL;
+		this.status = Status.NORMAL;
 		this.currentDrawSettings = NORMAL_DRAW_SETTINGS.duplicate();
 	}
 
@@ -28,17 +29,20 @@ public class Button extends AABB {
 			boolean leftMouseJustReleased) {
 		if (isColliding(mousePos)) {
 			if (leftMouseJustReleased) {
-				latestStatus = Status.RELEASED;
-			} else if (latestStatus == Status.DOWN || leftMouseJustPressed) {
+				status = Status.RELEASED;
+			} else if (leftMouseJustPressed) {
 				currentDrawSettings.copy(DOWN_DRAW_SETTINGS);
-				latestStatus = Status.DOWN;
+				status = Status.PRESSED;
+			} else if (status == Status.DOWN || status == Status.PRESSED) {
+				currentDrawSettings.copy(DOWN_DRAW_SETTINGS);
+				status = Status.DOWN;
 			} else {
 				currentDrawSettings.copy(HOVER_DRAW_SETTINGS);
-				latestStatus = Status.HOVERED;
+				status = Status.HOVERED;
 			}
 		} else {
 			currentDrawSettings.copy(NORMAL_DRAW_SETTINGS);
-			latestStatus = Status.NORMAL;
+			status = Status.NORMAL;
 		}
 	}
 
@@ -54,11 +58,11 @@ public class Button extends AABB {
 		return text;
 	}
 
-	public Status getLatestStatus() {
-		return latestStatus;
+	public Status getStatus() {
+		return status;
 	}
 
 	public String toString() {
-		return "Button, Text: " + text + "Status: " + latestStatus + " " + super.toString();
+		return "Button, Text: " + text + "Status: " + status + " " + super.toString();
 	}
 }
