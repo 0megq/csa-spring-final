@@ -130,12 +130,24 @@ public class GameCanvas extends JComponent {
 						if (mainQuitButton.getStatus() == Button.Status.RELEASED) {
 							currentMenu = Menu.NONE;
 						}
+						if (mainQuitButton.getStatus() == Button.Status.RELEASED) {
+							System.exit(0);
+						}
 						break;
 					case PAUSE:
 						pauseResumeButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
 						pauseMainMenuButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
 						pauseQuitButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
-						if (pauseResumeButton.getStatus() == Button.Status)
+						if (pauseResumeButton.getStatus() == Button.Status.RELEASED) {
+							currentMenu = Menu.NONE;
+						}
+						if (pauseMainMenuButton.getStatus() == Button.Status.RELEASED) {
+							currentMenu = Menu.MAIN;
+							world = null;
+						}
+						if (pauseQuitButton.getStatus() == Button.Status.RELEASED) {
+							System.exit(0);
+						}
 						break;
 					case LEVEL_SELECT:
 						break;
@@ -159,6 +171,8 @@ public class GameCanvas extends JComponent {
 		});
 		// Start game update cycle
 		updateTimer.start();
+
+		
 
 		// Get mouse clicks and send clicks to world object
 		addMouseListener(new MouseAdapter() {
