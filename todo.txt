@@ -15,8 +15,8 @@ UI
 	0 draw hole with flag
 	- improve launch line aesthetics
 	- show previous launch trajectory
-	- current menu will be stored and when menu switches the appropriate graphics will switch on and off
-	- main menu
+	0 current menu will be stored and when menu switches the appropriate graphics will switch on and off
+	0 main menu
 		- play button
 		- level select button
 		- quit button
@@ -25,7 +25,7 @@ UI
 		- quit
 		- next
 		- retry
-	- pause menu
+	0 pause menu
 		- resume
 		- main menu
 		- quit
