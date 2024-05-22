@@ -23,6 +23,7 @@ public class GameCanvas extends JComponent {
 	private ButtonDrawer[] mainButtonDrawers;
 	private ButtonDrawer[] pauseButtonDrawers;
 	private ButtonDrawer[] resultsButtonDrawers;
+	private ButtonDrawer[] creditsButtonDrawers;
 	private int elapsedTicks;
 	private World world;
 	private int currentLevel;
@@ -46,7 +47,7 @@ public class GameCanvas extends JComponent {
 		mousePos = new Vector2();
 		currentLevel = 0;
 		elapsedTicks = 0;
-		currentMenu = Menu.PAUSE;
+		currentMenu = Menu.CREDITS;
 
 		// Create world
 		world = initializeWorld(Level.LEVELS[currentLevel]);
@@ -90,21 +91,36 @@ public class GameCanvas extends JComponent {
 		pauseButtonDrawers = new ButtonDrawer[] {new ButtonDrawer(pauseResumeButton), new ButtonDrawer(pauseMainMenuButton), new ButtonDrawer(pauseQuitButton)};
 
 		// Results menu
-		Button resultsMainMenuButton = new Button(160, 290, 80, 30, "Main Menu",
+		Button resultsMainMenuButton = new Button(160, 240, 80, 30, "Main Menu",
 				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
-		Button resultsRetryButton = new Button(260, 290, 80, 30, "Retry",
+		Button resultsRetryButton = new Button(260, 240, 80, 30, "Retry",
 				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
-		Button resultsNextButton = new Button(360, 290, 80, 30, "Next",
+		Button resultsNextButton = new Button(360, 240, 80, 30, "Next",
 				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
-
 
 		resultsButtonDrawers = new ButtonDrawer[] {new ButtonDrawer(resultsMainMenuButton), new ButtonDrawer(resultsRetryButton), new ButtonDrawer(resultsNextButton)};
+
+		// Credits menu
+		Button creditsMainMenuButton = new Button(260, 240, 80, 30, "Main Menu",
+				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
+		Button creditsPlayAgainButton = new Button(360, 240, 80, 30, "Play Again",
+				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
+		Button creditsQuitButton = new Button(160, 240, 80, 30, "Quit",
+				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
+
+		creditsButtonDrawers = new ButtonDrawer[] {new ButtonDrawer(creditsQuitButton), new ButtonDrawer(creditsMainMenuButton), new ButtonDrawer(creditsPlayAgainButton)};
 
 		// AABB cursorFollow = new AABB(0, 0, 15, 15);
 
@@ -129,7 +145,11 @@ public class GameCanvas extends JComponent {
 						world.updateInput(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased, rightMousePressed, rightMouseJustPressed, rightMouseJustReleased);
 						world.update(DELTA);
 						if (world.getWaitingForInput() && world.isBallInHole()) {
-							currentMenu = Menu.RESULTS;
+							if (currentLevel < Level.LEVELS.length - 1) { // If not last level. currentLevel = 0 LEVELS is 2 big. 0 < 2 - 1
+								currentMenu = Menu.RESULTS;
+							} else {
+								currentMenu = Menu.CREDITS;
+							}
 						}
 						break;
 					case MAIN:
@@ -143,9 +163,9 @@ public class GameCanvas extends JComponent {
 							world = initializeWorld(Level.LEVELS[currentLevel]);
 							currentMenu = Menu.NONE;
 						}
-						if (mainQuitButton.getStatus() == Button.Status.RELEASED) {
-							currentMenu = Menu.NONE;
-						}
+						// if (mainQuitButton.getStatus() == Button.Status.RELEASED) {
+						// 	currentMenu = Menu.NONE;
+						// }
 						if (mainQuitButton.getStatus() == Button.Status.RELEASED) {
 							System.exit(0);
 						}
@@ -168,8 +188,39 @@ public class GameCanvas extends JComponent {
 					case LEVEL_SELECT:
 						break;
 					case RESULTS:
+						resultsMainMenuButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+						resultsNextButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+						resultsRetryButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+						if (resultsMainMenuButton.getStatus() == Button.Status.RELEASED) {
+							currentMenu = Menu.MAIN;
+						}
+						if (resultsNextButton.getStatus() == Button.Status.RELEASED) {
+							currentLevel++;
+							if (currentLevel < Level.LEVELS.length) {
+								world = initializeWorld(Level.LEVELS[currentLevel]);
+								currentMenu = Menu.NONE;
+							}
+						}
+						if (resultsRetryButton.getStatus() == Button.Status.RELEASED) {
+							world = initializeWorld(Level.LEVELS[currentLevel]);
+							currentMenu = Menu.NONE;
+						}
 						break;
 					case CREDITS:
+						creditsMainMenuButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+						creditsQuitButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+						creditsPlayAgainButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+						if (creditsMainMenuButton.getStatus() == Button.Status.RELEASED) {
+							currentMenu = Menu.MAIN;
+						}
+						if (creditsPlayAgainButton.getStatus() == Button.Status.RELEASED) {
+							currentLevel = 0;
+							world = initializeWorld(Level.LEVELS[currentLevel]);
+							currentMenu = Menu.NONE;
+						}
+						if (creditsQuitButton.getStatus() == Button.Status.RELEASED) {
+							System.exit(0);
+						}
 						break;
 				}
 
@@ -308,7 +359,11 @@ public class GameCanvas extends JComponent {
 				drawWorld(g2);
 				g2.setColor(new Color(0, 0, 0, 100));
 				g2.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
-				g2.fillRect(130, 50, 340, 300);
+				g2.fillRect(130, 100, 340, 200);
+				g2.setColor(Color.WHITE);
+				g2.drawString("Level completed!", 255, 130);
+				g2.drawString("Par: " + world.PAR, 285, 170);
+				g2.drawString("Strokes: " + world.getStrokes(), 275, 210);
 				fontMetrics = g2.getFontMetrics();
 				for (ButtonDrawer drawer : resultsButtonDrawers) {
 					if (drawer.getShouldDraw()) {
@@ -317,6 +372,20 @@ public class GameCanvas extends JComponent {
 				}
 				break;
 			case CREDITS:
+				drawWorld(g2);
+				g2.setColor(new Color(0, 0, 0, 100));
+				g2.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
+				g2.fillRect(130, 100, 340, 200);
+				g2.setColor(Color.WHITE);
+				g2.drawString("Congratulations!", 255, 130);
+				g2.drawString("You beat all " + Level.LEVELS.length + " levels", 245, 170);
+				g2.drawString("Created by Nick Vatanshenas for APCSA 2024", 175, 210);
+				fontMetrics = g2.getFontMetrics();
+				for (ButtonDrawer drawer : creditsButtonDrawers) {
+					if (drawer.getShouldDraw()) {
+						drawer.draw(g2, fontMetrics);
+					}
+				}
 				break;	
 		}
 
@@ -358,6 +427,7 @@ public class GameCanvas extends JComponent {
 			g2.drawLine((int) startPos.getX(), (int) startPos.getY(), (int) mousePos.getX(), (int) mousePos.getY());
 		}
 
+		g2.setColor(Color.WHITE);
 		g2.drawString("Par: " + world.PAR, 10, 20);
 		g2.drawString("Stroke: " + world.getStrokes(), 530, 20);
 		if (world.isAiming()) {
