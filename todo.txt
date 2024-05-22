@@ -1,3 +1,7 @@
+Physics bugs
+- Ball sliding when aiming into ground
+- Ball doesn't bounce
+
 Other
 	0 Make the aim only trigger by left click and cancelled by right click
 	- Make the actual levels
