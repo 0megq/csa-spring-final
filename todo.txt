@@ -1,6 +1,7 @@
 Physics bugs
-- Ball sliding when aiming into ground
-- Ball doesn't bounce
+0 Ball sliding when aiming into ground
+0 Ball doesn't bounce
+0 Ball falling through floor
 
 Other
 	0 Make the aim only trigger by left click and cancelled by right click
@@ -19,13 +20,17 @@ UI
 	0 draw hole with flag
 	- improve launch line aesthetics
 	- show previous launch trajectory
+	- level select menu
+		- Show each level as a button
+		- Level buttons are arranged manually
+		- Level button will have the level's best score underneath them
 	0 current menu will be stored and when menu switches the appropriate graphics will switch on and off
 	0 main menu
 		- play button
 		- level select button
 		- quit button
 		- tutorial
-	- next level menu
+	0 next level menu
 		- quit
 		- next
 		- retry
@@ -46,30 +51,18 @@ Button class
 			- based on that the code will do something, such as quit level or next level or unpause game
 
 
-Menu class
-	description
-		stores information about its buttons, aabbs, and other graphics it needs to draw. Responds appropriately to each button press
-	variables
-		buttons
-		aabbs
-
-	functions
-		update()
-			- this will call the buttons update()
-		some way of getting signals from the menus buttons to do things in the game
-
-
 Level switching:
-	- call isBallInHole
+	0 call isBallInHole
 	- if in hole
-		- store strokes if lowest amount for level
-		- if last level
+		0 store strokes if lowest amount for level
+			- indicate if strokes is lowest in next level menu
+		0 if last level
 			- Show congratulations/credits menu
 				- main menu
 				- play again
 				- quit game
 				- Nick Vatanshenas for AP CSA 2024
-		- next level menu
+		0 next level menu
 			- wait for input
 			- if next
 				- increment level number

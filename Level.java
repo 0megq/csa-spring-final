@@ -13,7 +13,7 @@ public class Level {
 					new AABB(440, 240, 69, 140), new AABB(516, 240, 84, 140), new AABB(509, 247, 7, 133) },
 			new AABB(509, 245, 7, 2),
 			5);
-	public static final Level[] LEVELS = {LEVEL1, LEVEL2};
+	public static final Level[] LEVELS = { LEVEL1, LEVEL2 };
 	public final Vector2 BALL_START;
 	public final AABB[] TERRAIN;
 	public final AABB HOLE;

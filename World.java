@@ -2,10 +2,10 @@ public class World {
 	private static final double HEIGHT_LIMIT = Game.HEIGHT * 40;
 	private static final AABB BOUNDS = new AABB(0, -HEIGHT_LIMIT, Game.WIDTH, Game.HEIGHT + HEIGHT_LIMIT);
 	private static final int MAX_SWEEPS_PER_FRAME = 10;
-	private static final double MAX_GROUNDED_VELOCITY = 3.0; // the y velocity at which the ball is considered to be grounded
+	private static final double MAX_GROUNDED_VELOCITY = 6.0; // the y velocity at which the ball is considered to be grounded
 	private static final int BALL_SIZE = 5;
 	private static final double BALL_BOUNCE_FACTOR = 0.4;
-	private static final double BALL_GRAVITY = 500.0;
+	private static final double BALL_GRAVITY = 700.0;
 	private static final double BALL_FRICTION = 300.0;
 	private static final double BALL_LAUNCH_MULTIPLIER = 4.0; // Multiplied by distance between ball and mouse to get magnitude of launch velocity
 	public final AABB[] TERRAIN;
@@ -25,6 +25,9 @@ public class World {
 	private Vector2 aimStartPos;
 	private boolean aiming; // When mouse is held down and mouse is moving around. If mouse goes off screen this turns to false
 	private int strokes; // Amount of turns the player has taken. Doesn't count failed ball simulations
+
+	// Debug stuff
+	// private Vector2 lastLaunchVelocity;
 
 	public World(Level level) {
 		// Load level data into instance fields
@@ -47,6 +50,9 @@ public class World {
 		rightMouseJustReleased = false;
 		waitingForInput = false;
 		mousePos = new Vector2();
+
+		// Debug
+		// lastLaunchVelocity = new Vector2();
 	}
 
 	public void updateInput(Vector2 mousePos, boolean lmbPressed, boolean lmbJustPressed, boolean lmbJustReleased,
@@ -68,7 +74,7 @@ public class World {
 			groundAabb.setPos(ballAABB.getPos());
 			AABB groundCollider = groundAabb.isColliding(TERRAIN);
 			// If ball is near the ground and y velocity is low enough
-			if (groundCollider != null && ballVelocity.getY() <= MAX_GROUNDED_VELOCITY) {
+			if (groundCollider != null && Math.abs(ballVelocity.getY()) <= MAX_GROUNDED_VELOCITY) {
 				ballVelocity.setY(0);
 				// This is the new x speed (direction not included) of the ball after friction
 				double newXSpeed = Math.abs(ballVelocity.getX()) - BALL_FRICTION * DELTA;
@@ -108,10 +114,12 @@ public class World {
 				Vector2 mouseToStart = aimStartPos.subtract(mousePos);
 				Vector2 newBallVel = mouseToStart.normalize()
 						.multiply(mouseToStart.getLength() * BALL_LAUNCH_MULTIPLIER);
-				strokes++;
 				ballVelocity.copy(newBallVel);
 				ballLaunchPos.copy(ballAABB.getPos());
-				ballAABB.getPos().setY(ballAABB.getPos().getY() - MAX_GROUNDED_VELOCITY * DELTA); // Bug fix for ball glitching through floor
+				strokes++;
+				// System.out.println("Stroke " + strokes + " taken");
+
+				// lastLaunchVelocity.copy(ballVelocity);
 			}
 			if (mousePos.getX() < -1 || mousePos.getY() < -1 || mousePos.getX() > Game.WIDTH + 1
 					|| mousePos.getY() > Game.HEIGHT + 1 || rightMouseJustPressed) {
@@ -122,6 +130,11 @@ public class World {
 			aimStartPos.copy(mousePos);
 			aiming = true;
 		}
+		// else if (rightMouseJustPressed) {
+		// 	waitingForInput = false;
+		// 	ballVelocity.copy(lastLaunchVelocity);
+		// 	System.out.println("Launched ball with previous velocity");
+		// }
 	}
 
 	// get collision
@@ -164,13 +177,18 @@ public class World {
 	}
 
 	private AABB.Collision getSweepingBallCollision(double delta) {
+		// if ((ballVelocity.getY() * delta + ballAABB.getPos().getY()) > 275) {
+		// 	System.out.println("Going into ground with Velocity * Delta: " + delta * ballVelocity.getY() + " Pos: "
+		// 			+ ballAABB.getPos());
+		// }
 		AABB.Collision collision = null;
 		for (AABB terrainAABB : TERRAIN) {
 			AABB.Collision currentCollision = ballAABB.sweepAABB(terrainAABB, ballVelocity);
 			// Find the collision with the smallest delta
-			if (currentCollision != null && currentCollision.DELTA <= delta && currentCollision.DELTA > 0) {
+			if (currentCollision != null && currentCollision.DELTA <= delta && currentCollision.DELTA >= 0) {
 				if (collision == null || collision.DELTA > currentCollision.DELTA) {
 					collision = currentCollision;
+					// System.out.println("Collision detected");
 				}
 			}
 		}

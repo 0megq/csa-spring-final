@@ -55,11 +55,11 @@ public class AABB {
 		// Only need to pad top and left because the position is based on top left corner
 		paddedAabb.setPos(other.getPos().subtract(size)); // Adjust position for new padded size.
 
-		// Variables to see which side the segment is on
-		boolean top = segmentStart.getY() < paddedAabb.pos.getY();
-		boolean bottom = segmentStart.getY() > paddedAabb.getEnd().getY();
-		boolean left = segmentStart.getX() < paddedAabb.pos.getX();
-		boolean right = segmentStart.getX() > paddedAabb.getEnd().getX();
+		// Variables to see which side the segment could potentially collide on
+		boolean top = segmentStart.getY() <= paddedAabb.pos.getY() && velocity.getY() > 0;
+		boolean bottom = segmentStart.getY() >= paddedAabb.getEnd().getY() && velocity.getY() < 0;
+		boolean left = segmentStart.getX() <= paddedAabb.pos.getX() && velocity.getX() > 0;
+		boolean right = segmentStart.getX() >= paddedAabb.getEnd().getX() && velocity.getX() < 0;
 		// System.out.println(top + " " + bottom + " " + right + " " + left);
 
 		Collision collision = null;
