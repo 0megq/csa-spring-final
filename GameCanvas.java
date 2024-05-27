@@ -46,7 +46,7 @@ public class GameCanvas extends JComponent {
 		rightMouseJustPressed = false;
 		rightMouseJustReleased = false;
 		mousePos = new Vector2();
-		currentLevel = 0;
+		currentLevel = 1;
 		elapsedTicks = 0;
 		currentMenu = Menu.NONE;
 		levelStrokes = new int[Level.LEVELS.length];
@@ -304,15 +304,6 @@ public class GameCanvas extends JComponent {
 		});
 		setFocusable(true);
 		requestFocus();
-	}
-
-	public void changeMenu(Menu newMenu) {
-		// this is here if i need it. i dont need now, but maybe i will later
-	}
-
-	// TODO implement this
-	public Level getLevel() {
-		return null;
 	}
 
 	// Creates a new world and connects it to the graphics
