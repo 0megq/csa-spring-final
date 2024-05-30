@@ -16,9 +16,10 @@ public class Level {
 	public static final Level LEVEL3 = new Level(
 			new Vector2(190, 300),
 			new AABB[] { new AABB(460, 80, 100, 310), new AABB(240, 120, 80, 140),
-					new AABB(320, 160, 80, 80), new AABB(100, 150, 60, 230), new AABB(160, 320, 300, 50) },
-			new AABB(30, 245, 7, 2),
-			5);
+					new AABB(320, 160, 80, 80), new AABB(100, 150, 60, 230), new AABB(160, 320, 300, 50),
+					new AABB(160, 180, 50, 60), new AABB(220, 180, 20, 60), new AABB(0, 20, 40, 300),
+					new AABB(40, 220, 27, 60), new AABB(74, 220, 26, 60), new AABB(67, 227, 7, 53) },
+			new AABB(67, 225, 7, 2), 4);
 	public static final Level[] LEVELS = { LEVEL1, LEVEL2, LEVEL3 };
 	public final Vector2 BALL_START;
 	public final AABB[] TERRAIN;
