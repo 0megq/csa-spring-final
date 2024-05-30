@@ -46,7 +46,7 @@ public class GameCanvas extends JComponent {
 		rightMouseJustPressed = false;
 		rightMouseJustReleased = false;
 		mousePos = new Vector2();
-		currentLevel = 1;
+		currentLevel = 2;
 		elapsedTicks = 0;
 		currentMenu = Menu.NONE;
 		levelStrokes = new int[Level.LEVELS.length];
@@ -80,20 +80,25 @@ public class GameCanvas extends JComponent {
 				new ButtonDrawer(mainTutorialButton) };
 
 		// Pause menu
-		Button pauseResumeButton = new Button(230, 100, 120, 50, "Resume",
+		Button pauseResumeButton = new Button(230, 70, 120, 50, "Resume",
 				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
-		Button pauseMainMenuButton = new Button(230, 170, 120, 50, "Back to Main Menu",
+		Button pauseRetryButton = new Button(230, 140, 120, 50, "Restart",
 				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
-		Button pauseQuitButton = new Button(230, 240, 120, 50, "Quit",
+		Button pauseMainMenuButton = new Button(230, 210, 120, 50, "Back to Main Menu",
+				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
+		Button pauseQuitButton = new Button(230, 280, 120, 50, "Quit",
 				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
 
 		pauseButtonDrawers = new ButtonDrawer[] { new ButtonDrawer(pauseResumeButton),
+				new ButtonDrawer(pauseRetryButton),
 				new ButtonDrawer(pauseMainMenuButton), new ButtonDrawer(pauseQuitButton) };
 
 		// Results menu
@@ -186,9 +191,15 @@ public class GameCanvas extends JComponent {
 					case PAUSE:
 						pauseResumeButton.update(mousePos, leftMousePressed, leftMouseJustPressed,
 								leftMouseJustReleased);
+						pauseRetryButton.update(mousePos, leftMousePressed, leftMouseJustPressed,
+								leftMouseJustReleased);
 						pauseMainMenuButton.update(mousePos, leftMousePressed, leftMouseJustPressed,
 								leftMouseJustReleased);
 						pauseQuitButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+						if (pauseRetryButton.getStatus() == Button.Status.RELEASED) {
+							world = initializeWorld(Level.LEVELS[currentLevel]);
+							currentMenu = Menu.NONE;
+						}
 						if (pauseResumeButton.getStatus() == Button.Status.RELEASED) {
 							currentMenu = Menu.NONE;
 						}
