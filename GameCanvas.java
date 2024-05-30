@@ -8,7 +8,6 @@ public class GameCanvas extends JComponent {
 		NONE,
 		MAIN,
 		PAUSE,
-		LEVEL_SELECT,
 		RESULTS,
 		CREDITS,
 	}
@@ -36,6 +35,7 @@ public class GameCanvas extends JComponent {
 	private Vector2 mousePos;
 	private Menu currentMenu;
 	private boolean mainTutorialTextVisible;
+	private boolean mainLevelSelectVisible;
 	private int[] levelStrokes;
 
 	public GameCanvas() {
@@ -58,25 +58,26 @@ public class GameCanvas extends JComponent {
 
 		// Menus
 		// Main menu
-		Button mainPlayButton = new Button(250, 100, 100, 50, "Play!",
+		Button mainPlayButton = new Button(250, 70, 100, 50, "Play!",
 				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
-		// Button mainLevelSelectButton = new Button(250, 100, 100, 50, "Play!",
-		// 		new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
-		// 		new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
-		// 		new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
+		mainLevelSelectVisible = false;
+		Button mainLevelSelectButton = new Button(250, 140, 100, 50, "Level Select",
+				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
 		mainTutorialTextVisible = false;
-		Button mainTutorialButton = new Button(250, 170, 100, 50, "Tutorial",
+		Button mainTutorialButton = new Button(250, 210, 100, 50, "Tutorial",
 				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
-		Button mainQuitButton = new Button(250, 240, 100, 50, "Quit",
+		Button mainQuitButton = new Button(250, 280, 100, 50, "Quit",
 				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
 
-		mainButtonDrawers = new ButtonDrawer[] { new ButtonDrawer(mainPlayButton), new ButtonDrawer(mainQuitButton),
+		mainButtonDrawers = new ButtonDrawer[] { new ButtonDrawer(mainPlayButton), new ButtonDrawer(mainLevelSelectButton), new ButtonDrawer(mainQuitButton),
 				new ButtonDrawer(mainTutorialButton) };
 
 		// Pause menu
@@ -210,8 +211,6 @@ public class GameCanvas extends JComponent {
 						if (pauseQuitButton.getStatus() == Button.Status.RELEASED) {
 							System.exit(0);
 						}
-						break;
-					case LEVEL_SELECT:
 						break;
 					case RESULTS:
 						resultsMainMenuButton.update(mousePos, leftMousePressed, leftMouseJustPressed,
@@ -379,8 +378,6 @@ public class GameCanvas extends JComponent {
 						drawer.draw(g2, fontMetrics);
 					}
 				}
-				break;
-			case LEVEL_SELECT:
 				break;
 			case RESULTS:
 				drawWorld(g2);
