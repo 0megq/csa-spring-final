@@ -1,3 +1,8 @@
+Final countdown
+- level select
+- launch line
+
+
 Physics bugs
 0 Ball sliding when aiming into ground
 0 Ball doesn't bounce
