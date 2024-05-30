@@ -5,7 +5,7 @@ public class Level {
 					new AABB(360, 200, 100, 110), new AABB(550, 100, 50, 290),
 					new AABB(460, 240, 49, 140), new AABB(516, 240, 34, 140), new AABB(509, 247, 7, 133) },
 			new AABB(509, 245, 7, 2),
-			3);
+			2);
 	public static final Level LEVEL2 = new Level(
 			new Vector2(40, 320),
 			new AABB[] { new AABB(20, 340, 60, 30), new AABB(80, 300, 100, 90), new AABB(180, 240, 80, 110),
@@ -22,10 +22,12 @@ public class Level {
 			new AABB(67, 225, 7, 2), 4);
 	public static final Level LEVEL4 = new Level(
 			new Vector2(160, 260),
-			new AABB[] {new AABB(20, 120, 80, 260), new AABB(120, 280, 240, 80), new AABB(320, 200, 120, 100), new AABB(440, 120, 120, 200), new AABB(560, 40, 40, 320),
-				new AABB( 150, 160, 30, 80), new AABB( 220, 160, 80, 80), new AABB( 170, -120, 60, 220), new AABB(280, 60, 47, 60),
-				new AABB(334, 60, 66, 60), new AABB(327, 67, 7, 53), new AABB(100, 200, 25, 180),
-				new AABB(180, 190, 40, 40), new AABB(255, 155, 5, 10)},
+			new AABB[] { new AABB(20, 120, 80, 260), new AABB(120, 280, 240, 80), new AABB(320, 200, 120, 100),
+					new AABB(440, 120, 120, 200), new AABB(560, 40, 40, 320),
+					new AABB(150, 160, 30, 80), new AABB(220, 160, 80, 80), new AABB(170, -120, 60, 220),
+					new AABB(280, 60, 47, 60),
+					new AABB(334, 60, 66, 60), new AABB(327, 67, 7, 53), new AABB(100, 200, 25, 180),
+					new AABB(180, 190, 40, 40), new AABB(255, 155, 5, 10) },
 			new AABB(327, 65, 7, 2), 5);
 	public static final Level[] LEVELS = { LEVEL1, LEVEL2, LEVEL3, LEVEL4 };
 	public final Vector2 BALL_START;

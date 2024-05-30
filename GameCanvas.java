@@ -85,8 +85,9 @@ public class GameCanvas extends JComponent {
 				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
-		levelSelectButtonDrawers = new ButtonDrawer[] { new ButtonDrawer(levelSelectButton1), new ButtonDrawer(levelSelectButton2),
-			new ButtonDrawer(levelSelectButton3), new ButtonDrawer(levelSelectButton4)};
+		levelSelectButtonDrawers = new ButtonDrawer[] { new ButtonDrawer(levelSelectButton1),
+				new ButtonDrawer(levelSelectButton2),
+				new ButtonDrawer(levelSelectButton3), new ButtonDrawer(levelSelectButton4) };
 
 		mainTutorialTextVisible = false;
 		Button mainTutorialButton = new Button(250, 210, 100, 50, "Tutorial",
@@ -98,7 +99,8 @@ public class GameCanvas extends JComponent {
 				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
 
-		mainButtonDrawers = new ButtonDrawer[] { new ButtonDrawer(mainPlayButton), new ButtonDrawer(mainLevelSelectButton), new ButtonDrawer(mainQuitButton),
+		mainButtonDrawers = new ButtonDrawer[] { new ButtonDrawer(mainPlayButton),
+				new ButtonDrawer(mainLevelSelectButton), new ButtonDrawer(mainQuitButton),
 				new ButtonDrawer(mainTutorialButton) };
 
 		// Pause menu
@@ -189,7 +191,8 @@ public class GameCanvas extends JComponent {
 						break;
 					case MAIN:
 						mainPlayButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
-						mainLevelSelectButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+						mainLevelSelectButton.update(mousePos, leftMousePressed, leftMouseJustPressed,
+								leftMouseJustReleased);
 						mainTutorialButton.update(mousePos, leftMousePressed, leftMouseJustPressed,
 								leftMouseJustReleased);
 						mainQuitButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
@@ -208,10 +211,14 @@ public class GameCanvas extends JComponent {
 							mainLevelSelectVisible = !mainLevelSelectVisible;
 						}
 						if (mainLevelSelectVisible) {
-							levelSelectButton1.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
-							levelSelectButton2.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
-							levelSelectButton3.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
-							levelSelectButton4.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+							levelSelectButton1.update(mousePos, leftMousePressed, leftMouseJustPressed,
+									leftMouseJustReleased);
+							levelSelectButton2.update(mousePos, leftMousePressed, leftMouseJustPressed,
+									leftMouseJustReleased);
+							levelSelectButton3.update(mousePos, leftMousePressed, leftMouseJustPressed,
+									leftMouseJustReleased);
+							levelSelectButton4.update(mousePos, leftMousePressed, leftMouseJustPressed,
+									leftMouseJustReleased);
 							if (levelSelectButton1.getStatus() == Button.Status.RELEASED) {
 								currentLevel = 0;
 								currentMenu = Menu.NONE;
@@ -414,32 +421,36 @@ public class GameCanvas extends JComponent {
 					}
 				}
 				if (mainTutorialTextVisible) {
-					g2.drawString("Left click and drag to aim the ball.", 20, 160);
-					g2.drawString("Use right click to cancel.", 20, 180);
-					g2.drawString("The arrow on the ball indicates", 20, 200);
-					g2.drawString("direction and power.", 20, 220);
+					g2.drawString("Left click anywhere and drag to", 20, 160);
+					g2.drawString("aim the ball. Use right click to", 20, 180);
+					g2.drawString("cancel. The arrow on the ball", 20, 200);
+					g2.drawString("indicates direction and power.", 20, 220);
 					g2.drawString("Get the ball in the hole!", 20, 240);
 				}
 				if (mainLevelSelectVisible) {
 					String levelText;
 					if (levelStrokes[0] != -1) {
- 						levelText = "Strokes: " + levelStrokes[0];
-					} else levelText = "Incomplete";
+						levelText = "Strokes: " + levelStrokes[0];
+					} else
+						levelText = "Incomplete";
 					g2.drawString(levelText, 400, 195);
-					
+
 					if (levelStrokes[1] != -1) {
- 						levelText = "Strokes: " + levelStrokes[1];
-					} else levelText = "Incomplete";
+						levelText = "Strokes: " + levelStrokes[1];
+					} else
+						levelText = "Incomplete";
 					g2.drawString(levelText, 490, 195);
 
 					if (levelStrokes[2] != -1) {
- 						levelText = "Strokes: " + levelStrokes[2];
-					} else levelText = "Incomplete";
+						levelText = "Strokes: " + levelStrokes[2];
+					} else
+						levelText = "Incomplete";
 					g2.drawString(levelText, 400, 295);
 
 					if (levelStrokes[3] != -1) {
- 						levelText = "Strokes: " + levelStrokes[3];
-					} else levelText = "Incomplete";
+						levelText = "Strokes: " + levelStrokes[3];
+					} else
+						levelText = "Incomplete";
 					g2.drawString(levelText, 490, 295);
 
 					for (ButtonDrawer drawer : levelSelectButtonDrawers) {
@@ -530,7 +541,7 @@ public class GameCanvas extends JComponent {
 			g2.setColor(Color.MAGENTA);
 			g2.drawLine((int) ballPos.getX(), (int) ballPos.getY(), (int) directionPos.getX(),
 					(int) directionPos.getY());
-			g2.fillOval((int)directionPos.getX() - 3, (int)directionPos.getY() - 3, 6, 6);
+			g2.fillOval((int) directionPos.getX() - 3, (int) directionPos.getY() - 3, 6, 6);
 			// g2.setColor(Color.BLACK);
 			// g2.drawLine((int) startPos.getX(), (int) startPos.getY(), (int) mousePos.getX(), (int) mousePos.getY());
 		}
