@@ -46,7 +46,7 @@ public class GameCanvas extends JComponent {
 		rightMouseJustPressed = false;
 		rightMouseJustReleased = false;
 		mousePos = new Vector2();
-		currentLevel = 2;
+		currentLevel = 3;
 		elapsedTicks = 0;
 		currentMenu = Menu.NONE;
 		levelStrokes = new int[Level.LEVELS.length];
