@@ -215,6 +215,11 @@ public class World {
 		return aiming;
 	}
 
+	public void cancelAiming() {
+		aiming = false;
+		waitingForInput = true;
+	}
+
 	public Vector2 getMousePos() {
 		return mousePos;
 	}

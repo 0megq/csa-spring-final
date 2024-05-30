@@ -28,7 +28,7 @@ public class Button extends AABB {
 	public void update(Vector2 mousePos, boolean leftMousePressed, boolean leftMouseJustPressed,
 			boolean leftMouseJustReleased) {
 		if (isColliding(mousePos)) {
-			if (leftMouseJustReleased) {
+			if (leftMouseJustReleased && (status == Status.DOWN || status == Status.PRESSED)) {
 				status = Status.RELEASED;
 			} else if (leftMouseJustPressed) {
 				currentDrawSettings.copy(DOWN_DRAW_SETTINGS);

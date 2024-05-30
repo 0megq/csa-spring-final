@@ -1,6 +1,4 @@
 Final countdown
-- level select
-- launch line
 
 
 Physics bugs

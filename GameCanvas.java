@@ -1,3 +1,4 @@
+import GameCanvas.Menu;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class GameCanvas extends JComponent {
 	private ArrayList<AABBDrawer> worldDrawers = new ArrayList<AABBDrawer>();
 	private ArrayList<AABBDrawer> otherDrawers = new ArrayList<AABBDrawer>();
 	private ButtonDrawer[] mainButtonDrawers;
+	private ButtonDrawer[] levelSelectButtonDrawers;
 	private ButtonDrawer[] pauseButtonDrawers;
 	private ButtonDrawer[] resultsButtonDrawers;
 	private ButtonDrawer[] creditsButtonDrawers;
@@ -46,9 +48,9 @@ public class GameCanvas extends JComponent {
 		rightMouseJustPressed = false;
 		rightMouseJustReleased = false;
 		mousePos = new Vector2();
-		currentLevel = 3;
+		currentLevel = 0;
 		elapsedTicks = 0;
-		currentMenu = Menu.NONE;
+		currentMenu = Menu.MAIN;
 		levelStrokes = new int[Level.LEVELS.length];
 		for (int i = 0; i < levelStrokes.length; i++)
 			levelStrokes[i] = -1; // -1 indicates that a level has not been completed yet
@@ -67,6 +69,25 @@ public class GameCanvas extends JComponent {
 				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
 				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
+		Button levelSelectButton1 = new Button(400, 120, 60, 60, "Level 1",
+				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
+		Button levelSelectButton2 = new Button(490, 120, 60, 60, "Level 2",
+				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
+		Button levelSelectButton3 = new Button(400, 220, 60, 60, "Level 3",
+				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
+		Button levelSelectButton4 = new Button(490, 220, 60, 60, "Level 4",
+				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(150, 150, 150)),
+				new AABBDrawSettings(true, DrawType.FILL, new Color(100, 100, 100)));
+		levelSelectButtonDrawers = new ButtonDrawer[] { new ButtonDrawer(levelSelectButton1), new ButtonDrawer(levelSelectButton2),
+			new ButtonDrawer(levelSelectButton3), new ButtonDrawer(levelSelectButton4)};
+
 		mainTutorialTextVisible = false;
 		Button mainTutorialButton = new Button(250, 210, 100, 50, "Tutorial",
 				new AABBDrawSettings(true, DrawType.FILL, new Color(200, 200, 200)),
@@ -168,6 +189,7 @@ public class GameCanvas extends JComponent {
 						break;
 					case MAIN:
 						mainPlayButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+						mainLevelSelectButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
 						mainTutorialButton.update(mousePos, leftMousePressed, leftMouseJustPressed,
 								leftMouseJustReleased);
 						mainQuitButton.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
@@ -182,9 +204,35 @@ public class GameCanvas extends JComponent {
 							world = initializeWorld(Level.LEVELS[currentLevel]);
 							currentMenu = Menu.NONE;
 						}
-						// if (mainQuitButton.getStatus() == Button.Status.RELEASED) {
-						// 	currentMenu = Menu.NONE;
-						// }
+						if (mainLevelSelectButton.getStatus() == Button.Status.RELEASED) {
+							mainLevelSelectVisible = !mainLevelSelectVisible;
+						}
+						if (mainLevelSelectVisible) {
+							levelSelectButton1.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+							levelSelectButton2.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+							levelSelectButton3.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+							levelSelectButton4.update(mousePos, leftMousePressed, leftMouseJustPressed, leftMouseJustReleased);
+							if (levelSelectButton1.getStatus() == Button.Status.RELEASED) {
+								currentLevel = 0;
+								currentMenu = Menu.NONE;
+								world = initializeWorld(Level.LEVELS[currentLevel]);
+							}
+							if (levelSelectButton2.getStatus() == Button.Status.RELEASED) {
+								currentLevel = 1;
+								currentMenu = Menu.NONE;
+								world = initializeWorld(Level.LEVELS[currentLevel]);
+							}
+							if (levelSelectButton3.getStatus() == Button.Status.RELEASED) {
+								currentLevel = 2;
+								currentMenu = Menu.NONE;
+								world = initializeWorld(Level.LEVELS[currentLevel]);
+							}
+							if (levelSelectButton4.getStatus() == Button.Status.RELEASED) {
+								currentLevel = 3;
+								currentMenu = Menu.NONE;
+								world = initializeWorld(Level.LEVELS[currentLevel]);
+							}
+						}
 						if (mainQuitButton.getStatus() == Button.Status.RELEASED) {
 							System.exit(0);
 						}
@@ -305,9 +353,10 @@ public class GameCanvas extends JComponent {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-					if (currentMenu == Menu.NONE)
+					if (currentMenu == Menu.NONE) {
 						currentMenu = Menu.PAUSE;
-					else if (currentMenu == Menu.PAUSE)
+						world.cancelAiming();
+					} else if (currentMenu == Menu.PAUSE)
 						currentMenu = Menu.NONE;
 				}
 			}
@@ -357,6 +406,7 @@ public class GameCanvas extends JComponent {
 				drawWorld(g2);
 				break;
 			case MAIN:
+				g2.drawString("Golfing from the Side", 245, 40);
 				FontMetrics fontMetrics = g2.getFontMetrics();
 				for (ButtonDrawer drawer : mainButtonDrawers) {
 					if (drawer.getShouldDraw()) {
@@ -364,8 +414,39 @@ public class GameCanvas extends JComponent {
 					}
 				}
 				if (mainTutorialTextVisible) {
-					g2.drawString("This is a tutorial", 380, 160);
-					g2.drawString("Hello!", 380, 175);
+					g2.drawString("Left click and drag to aim the ball.", 20, 160);
+					g2.drawString("Use right click to cancel.", 20, 180);
+					g2.drawString("The arrow on the ball indicates", 20, 200);
+					g2.drawString("direction and power.", 20, 220);
+					g2.drawString("Get the ball in the hole!", 20, 240);
+				}
+				if (mainLevelSelectVisible) {
+					String levelText;
+					if (levelStrokes[0] != -1) {
+ 						levelText = "Strokes: " + levelStrokes[0];
+					} else levelText = "Incomplete";
+					g2.drawString(levelText, 400, 195);
+					
+					if (levelStrokes[1] != -1) {
+ 						levelText = "Strokes: " + levelStrokes[1];
+					} else levelText = "Incomplete";
+					g2.drawString(levelText, 490, 195);
+
+					if (levelStrokes[2] != -1) {
+ 						levelText = "Strokes: " + levelStrokes[2];
+					} else levelText = "Incomplete";
+					g2.drawString(levelText, 400, 295);
+
+					if (levelStrokes[3] != -1) {
+ 						levelText = "Strokes: " + levelStrokes[3];
+					} else levelText = "Incomplete";
+					g2.drawString(levelText, 490, 295);
+
+					for (ButtonDrawer drawer : levelSelectButtonDrawers) {
+						if (drawer.getShouldDraw()) {
+							drawer.draw(g2, fontMetrics);
+						}
+					}
 				}
 				break;
 			case PAUSE:
@@ -440,16 +521,18 @@ public class GameCanvas extends JComponent {
 		}
 
 		// aiming line
-		if (world.isAiming()) {
-			g2.setColor(Color.BLACK);
+		if (world.isAiming() && !world.getAimStartPos().equals(world.getMousePos())) {
 			g2.setStroke(new BasicStroke(aimLineWidth));
 			Vector2 ballPos = world.getBallAABB().getCenter();
 			Vector2 startPos = world.getAimStartPos();
 			Vector2 mousePos = world.getMousePos();
 			Vector2 directionPos = ballPos.add(startPos.subtract(mousePos));
+			g2.setColor(Color.MAGENTA);
 			g2.drawLine((int) ballPos.getX(), (int) ballPos.getY(), (int) directionPos.getX(),
 					(int) directionPos.getY());
-			g2.drawLine((int) startPos.getX(), (int) startPos.getY(), (int) mousePos.getX(), (int) mousePos.getY());
+			g2.fillOval((int)directionPos.getX() - 3, (int)directionPos.getY() - 3, 6, 6);
+			// g2.setColor(Color.BLACK);
+			// g2.drawLine((int) startPos.getX(), (int) startPos.getY(), (int) mousePos.getX(), (int) mousePos.getY());
 		}
 
 		g2.setColor(Color.WHITE);
