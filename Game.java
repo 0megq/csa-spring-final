@@ -1,5 +1,5 @@
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class Game {
 
@@ -23,6 +23,6 @@ public class Game {
 		//f.setCursor(c);
 
 		f.setVisible(true);
-
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }
